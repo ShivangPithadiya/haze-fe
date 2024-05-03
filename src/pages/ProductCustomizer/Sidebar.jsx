@@ -24,6 +24,8 @@ const Sidebar = () => {
   const activeId = useSelector(
     (state) => state?.customizeProduct.activeLayerId
   );
+  const ProductCustomizer = useSelector((state) => state?.customizeProduct);
+  
   const [openModallayer, setOpenModallayer] = useState(false);
   const modalRef = useRef(null);
   const [productName, setProductNameLocal] = useState("");
@@ -32,6 +34,25 @@ const Sidebar = () => {
   const[layerClick ,setLayerClick]=useState(true)
   const [settingClick, setSettingClick] = useState(false);
     const [productViews, setProductViews] = useState([]);
+  const ActiveLayerData = useSelector(
+    (state) => state?.customizeProduct.activeLayerData
+  );
+useEffect(() => {
+  setProductViews(customizeProduct?.layerData.images|| []);
+
+  if (activeId) {
+    const foundObject = customizeProduct?.layerData?.find(
+      (obj) => obj.layerId === activeId
+    );
+
+    if (foundObject && foundObject.dispalyType === 'Image' && (!foundObject.images || foundObject.images.length === 0)) {
+      handleAddProductView(); // Add a default product view if the active layer is an image and the images array is empty or undefined
+    }
+
+    dispatch(setActiveLayerData(foundObject));
+  }
+}, [activeId, customizeProduct]);
+
 
   const handleInputChange = (e) => {
     const productName = e.target.value;
@@ -39,35 +60,68 @@ const Sidebar = () => {
     dispatch(setProductName(productName));
   };
   const handleAddProductView = () => {
+ const existingData = ProductCustomizer.preview?.image?.find(
+      (view) => view.index === index
+    );
 
-   
+    const activeLayer = ProductCustomizer?.activeLayerId;
+  const foundObject = ProductCustomizer?.layerData?.find(
+      (obj) => obj.layerId === ProductCustomizer?.activeLayerId
+    );
+    const imagesArray = foundObject?.images;
+    // const index = productViews.length + 1;
+     const id =
+      Math.random().toString(36).substr(2, 9) + "_" + Date.now().toString(36);
+    const imageName = "Untitled Image";
+       const imageData = Array.isArray(imagesArray)
+      ? [
+          ...imagesArray,
+          { id, layerId: activeLayer, imageName: imageName, url: '' },
+        ]
+      : [{ id, layerId: activeLayer, imageName: imageName, url: '' }];
 
-    const index = productViews.length + 1;
-    const newProductView = {
-      index: index,
-      title: `Preview${index}`, // You can set a default title here
-      image: "", // You can set a default image here
-      layerId: activeId, // You can set a default layerId here
 
-      // Add more properties as needed
+ const updatedData = {
+      ...existingData,
+      images: imageData,
     };
-   dispatch(setpreview([...productViews, newProductView]));
 
+    
+    // const newProductView = {
+    //   // index: index,
+    //   // title: `Preview${index}`, // You can set a default title here
+    //    ...existingData,
+    //   images: imageData,
+
+    //   // Add more properties as needed
+    // };
+   dispatch(setpreview({ images: imageData}));
+ dispatch(setUpdateLayerData({ activeLayer, updatedData }));
 
    
   };
 
 const handleDeleteProductView = (index) => {
-  // Allow deletion of views other than index 0
+  console.log("index", index);
+  const activeLayer = ProductCustomizer?.activeLayerId;
 
-    const updatedViews = [...productViews];
-    updatedViews.splice(index, 1);
-    setProductViews(updatedViews);
-    setModal(false);
-    setOpenModallayer(false);
-    dispatch(setpreview(updatedViews));
+  // Retrieve the current views from Redux state
+  const currentViews = ActiveLayerData?.images || [];
+  
+  // Create a copy of the current views array
+  const updatedViews = [...currentViews];
 
+  // Remove the view at the specified index
+  updatedViews.splice(index, 1);
+const updatedData = {
+      images: updatedViews,
+    };
+  dispatch(setpreview({ images: updatedViews}));
+
+  // Dispatch the updated views array to update the layer data
+  dispatch(setUpdateLayerData({ activeLayer, updatedData}));
 };
+
 const handleModalSide1 = (e, type, index) => {
   if (index !== 0) {
     setModal(true);
@@ -140,13 +194,12 @@ const handleModalSide1 = (e, type, index) => {
         InputType: formData?.InputType,
         dispalyType: formData?.displayType,
         imageTitle: "Untitled Image",
-        thumbnailType: false,
         labeType: false,
       })
     );
     setOpenModal(false);
-    setInputType("");
-    setDisplayType("");
+    setInputType();
+    setDisplayType();
   };
    const haldleColse = () => {
      setModal(false);
@@ -712,7 +765,7 @@ const handleModalSide1 = (e, type, index) => {
                 />
               </div>
               <div className="d-flex flex-column">
-                {productViews.map((view, index) => (
+                {productViews?.images?.map((view, index) => (
                   <div
                     key={index}
                     style={{
@@ -730,7 +783,7 @@ const handleModalSide1 = (e, type, index) => {
                         <MdOutlineViewInAr size={25} />
                       </span>
                       <div className="d-flex justify-content-between w-100">
-                        <p className="px-2 d-flex pt-2">{view.title}</p>
+                        <p className="px-2 d-flex pt-2">{view.imageName}</p>
                         <HiDotsVertical
                           onClick={(e) => handleModalSide(e, true)}
                           className="mt-2"
@@ -749,8 +802,8 @@ const handleModalSide1 = (e, type, index) => {
                                   <div className="">
                                     <div className="creat_modal_section_row creat_div flex justify-end">
                                       <span
-                                        onClick={() =>
-                                          handleDeleteProductView(index)
+                                        onClick={(e) =>
+                                          handleDeleteProductView(e,index)
                                         }
                                       >
                                         {" "}

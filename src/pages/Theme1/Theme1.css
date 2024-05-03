@@ -86,10 +86,10 @@ header .right_header_Section {
 
 
 .left_wrapper, .sider_baar {
-    padding-top: 7%;
+    padding-top: 3rem;
 }
 .sider_baar {
-    padding-top: 4.5%;
+    padding-top: 3rem;
     width: 18%;
     border-right: 1px solid var(--color-gainsboro);
 }

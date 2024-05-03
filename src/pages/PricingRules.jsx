@@ -1,6 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const PricingRules = () => {
+  const navigate = useNavigate()
+  const handleSimplePricing = () => {
+    navigate(`/pricing-rules-simple-pricing`)
+  }
+  const handleAdvancedPricing = () => {
+    navigate(`/pricing-rules-advanced-pricing`)
+  }
+
   return (
     <div className="left_wrapper">
       <div className="wrapper_header">
@@ -22,9 +31,9 @@ const PricingRules = () => {
                         Simple Pricing
                       </div>
                       <div className="pricing_rules_card_description">
-                        Customer Preview ImgDesktop version
+                        Customer Preview Img Desktop version
                       </div>
-                      <button className="pricing_rules_card_button mt-4 p-2 bg-dark text-white rounded">
+                      <button className="pricing_rules_card_button mt-4 p-2 bg-dark text-white rounded" onClick={() => handleSimplePricing()}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
@@ -43,7 +52,7 @@ const PricingRules = () => {
                             d="M12.4999 13.9374C12.2999 13.9374 12.0999 13.8612 11.9476 13.7085L8.63311 10.394C8.32803 10.089 8.32803 9.59443 8.63311 9.28936C8.93779 8.98428 9.43311 8.98428 9.73779 9.28936L13.0522 12.6038C13.3573 12.9089 13.3573 13.4034 13.0522 13.7085C12.8999 13.8608 12.6999 13.9374 12.4999 13.9374Z"
                             fill="white"
                           />
-                        </svg>
+                        </svg> {" "}
                         Select
                       </button>
                     </div>
@@ -144,11 +153,11 @@ const PricingRules = () => {
                     </div>
 
                     <div class="princing_rules_card_cont text-center">
-                      <div class="pricing_rules_card_title">Simple Pricing</div>
+                      <div class="pricing_rules_card_title">Advanced Pricing</div>
                       <div class="pricing_rules_card_description">
-                        Customer Preview ImgDesktop version
+                        Customer Preview Img Desktop version
                       </div>
-                      <button class="pricing_rules_card_button mt-4 p-2 bg-dark text-white rounded">
+                      <button class="pricing_rules_card_button mt-4 p-2 bg-dark text-white rounded" onClick={() => handleAdvancedPricing()}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
@@ -167,7 +176,7 @@ const PricingRules = () => {
                             d="M12.4999 13.9374C12.2999 13.9374 12.0999 13.8612 11.9476 13.7085L8.63311 10.394C8.32803 10.089 8.32803 9.59443 8.63311 9.28936C8.93779 8.98428 9.43311 8.98428 9.73779 9.28936L13.0522 12.6038C13.3573 12.9089 13.3573 13.4034 13.0522 13.7085C12.8999 13.8608 12.6999 13.9374 12.4999 13.9374Z"
                             fill="white"
                           />
-                        </svg>
+                        </svg> {" "}
                         Select
                       </button>
                     </div>

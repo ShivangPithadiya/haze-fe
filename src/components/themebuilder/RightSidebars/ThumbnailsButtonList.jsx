@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useContext } from "react";
-import { ChromePicker } from "react-color";
+import { SketchPicker } from "react-color";
 import ThemeContext from "../../../contexts/ThemeContext";
 
 const ThumbnailsButtonList = () => {

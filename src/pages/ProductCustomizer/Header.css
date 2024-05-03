@@ -8,7 +8,28 @@
     padding-left: 2%;
     align-items: normal;
   }
+    .spinner {
+      animation: rotator 1.4s linear infinite;
+    }
   
+    @keyframes rotator {
+      0% {
+        transform: rotate(0deg);
+      }
+  
+      100% {
+        transform: rotate(270deg);
+      }
+    }
+  
+
+
+    .be1 {
+      position: relative;
+      align-self: center;
+      display: flex;
+      justify-content: center;
+    }
   .Haze_header {
     background: var(--color-off-white);
     width: 100%;
@@ -45,6 +66,10 @@
   .header_menu_list:first-child {
     color: #2d2d2d;
   }
+  .header_menu .pricing_list {
+    color: #2d2d2d;
+  }
+  
     .modal-content {
       border-radius: 20px;
      
@@ -68,23 +93,157 @@
     .modal-footer {
       border-top: none;
     }
-  
+    .modal-content {
+      border: var(--bs-modal-border-width) solid rgba(255, 255, 255, 0.2);
+    
+    }
     .btn {
      
       padding: 10px 20px;
       font-size: 18px;
       font-weight: bold;
     }
+    .loading {
+        height: 0;
+          width: 0;
+          padding: 32px;
+          border: 10px solid #ccc;
+          border-right-color: #00a7d5;
+          border-radius: 55px;
+          -webkit-animation: rotate 1s infinite linear;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+    }
+             .progress {
+               width: 500px;
+               height: 20px;
+               background-color: #5b5b5b;
+               border-radius: 100px;
+               overflow: hidden;
+             }
+      
+             .progress_item {
+               height: 100%;
+               background-image: linear-gradient(#ff0f7b 0%, #f8932d 100%);
+               animation: load 5s linear alternate infinite;
+             }
+      
+             @keyframes load {
+               0% {
+                 width: 0%;
+               }
+      
+               100% {
+                 width: 100%;
+               }
+             }
   
+    @-webkit-keyframes rotate {
+  
+      /* 100% keyframe for  clockwise. 
+       use 0% instead for anticlockwise */
+      100% {
+        -webkit-transform: rotate(360deg);
+      }
+    }
   
     .modal-header .btn-close {
      
-      margin-top: -35px;
+      margin-top: -17px;
     }
     .btn-secondary {
       background-color: #ddd;
       color: #333;
     }
+        .loading1 {
+          display: flex;
+          flex-direction: row;
+        }
+    
+        .loading__letter {
+          font-size: 24px;
+          font-weight: normal;
+          letter-spacing: 4px;
+          text-transform: uppercase;
+          font-family: "Audiowide";
+          color: #000000;
+          animation-name: bounce;
+          animation-duration: 2s;
+          animation-iteration-count: infinite;
+        }
+    
+        .loading__letter:nth-child(2) {
+          animation-delay: .1s;
+        }
+    
+        .loading__letter:nth-child(3) {
+          animation-delay: .2s;
+        }
+    
+        .loading__letter:nth-child(4) {
+          animation-delay: .3s;
+        }
+    
+        .loading__letter:nth-child(5) {
+          animation-delay: .4s;
+        }
+    
+        .loading__letter:nth-child(6) {
+          animation-delay: .5s;
+        }
+    
+        .loading__letter:nth-child(7) {
+          animation-delay: .6s;
+        }
+    
+        .loading__letter:nth-child(8) {
+          animation-delay: .8s;
+        }
+    
+        .loading__letter:nth-child(9) {
+          animation-delay: 1s;
+        }
+    
+        .loading__letter:nth-child(10) {
+          animation-delay: 1.2s;
+        }
+         .loading__letter:nth-child(11) {
+           animation-delay: 1.4s;
+         }
+                    .loading__letter:nth-child(12) {
+                      animation-delay: 1.4s;
+                    }
+                                            .loading__letter:nth-child(13) {
+                                              animation-delay: 1.6s;
+                                            }
+        @keyframes bounce {
+          0% {
+            transform: translateY(0px)
+          }
+    
+          40% {
+            transform: translateY(-40px);
+          }
+    
+          80%,
+          100% {
+            transform: translateY(0px);
+          }
+        }
+    
+    
+        @media (max-width: 700px) {
+          .loading__letter {
+            font-size: 50px;
+          }
+        }
+    
+        @media (max-width: 340px) {
+          .loading__letter {
+            font-size: 40px;
+          }
+        }
   
     .btn-danger {
       background-color: #ff6347;
@@ -136,7 +295,7 @@
   
   .left_wrapper,
   .sider_baar {
-    padding-top: 5%;
+    padding-top: 3rem;
   }
   .sider_baar {
     width: 18%;
@@ -150,3 +309,12 @@
     padding: 10px;
   }
   
+  .right_header_Section .hr_product{
+    border: 1px solid black;
+    margin: 3px;
+    height: 32px;
+  }
+  #dropdownContent p{
+    border-bottom: 1px solid red;
+    width: 100%;
+  }

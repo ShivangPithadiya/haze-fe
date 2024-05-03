@@ -1,4 +1,5 @@
 import _ from "lodash";
+import FileUpload from "./components/themebuilder/RightSidebars/FileUpload";
 
 const Utils = {
   siteCookieName: `${import.meta.env.VITE_REACT_APP_APPNAME}-userData`,
@@ -80,6 +81,12 @@ const Utils = {
       TextInputAndDropdownHeight: "",
       TextInputAndDropdownRounding: "",
       TextInputAndDropdownBorderColor: "",
+      TextInputAndDropdownMenuBackgroundColor: "",
+      TextInputAndDropdownFontSize: "",
+      TextInputAndDropdownHovOpClr: "",
+      TextInputAndDropdownFontColor: "",
+      TextInputAndDropdownSelcOpClr: "",
+      TextInputAndDropdownMenuFontColor: "",
       ThumbnailButtonVerticalMargin: "",
       ThumbnailButtonRoundingMobile: "",
       ThumbnailButtonWidthMobile: "",
@@ -141,6 +148,29 @@ const Utils = {
       ShareButtonTextButtonRounding: "",
       ShareButtonTextButtonLength: "small",
     },
+    FileUpload: {
+      FileUploadBackgroundColor: "#ffff",
+      FileUploadBorderColor: "#ffff",
+      FileUploadBorderRounding: "",
+      FileUploadBorderThickness: "",
+      FileUploadFontColor: "#ffff",
+      FileUploadLinkColor: "",
+      FileUploadFontFamily: "",
+      FileUploadFontSize: "",
+      FileUploadImgRoundings: "",
+      FileUploadRemoveoptionbgColor: "#ffff",
+      FileUploadRemoveophoverbgColor: "#ffff",
+      FileUploadRemoveIconColor: "#ffff",
+    },
+     PrintReady: {
+          PrintReadyEditionColor: "#ffff",
+          PrintReadyEditionIconColor: "#ffff",
+          PrintReadyEditionDPIIndicatorTextColor: "#ffff",
+          DPILowQualityTextColor: "#ffff",
+          LowQualityMessageBackgroundColor: "#ffff",
+          LowQualityMessageTextColor:"#ffff",
+          DPIHighQualityColor:"#ffff"
+        },
     DescriptionMobile: {
       DescriptionMobileColor: "#ffff",
       DescriptionMobileBackgroundColor: "#ffff",

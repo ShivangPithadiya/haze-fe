@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useContext } from "react";
-import { ChromePicker } from "react-color";
+import { SketchPicker } from "react-color";
 import ThemeContext from "../../../contexts/ThemeContext";
 
 const Customizer = () => {
@@ -54,8 +54,10 @@ const Customizer = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+            className="c1"
               color={{
                 hex: customizerData?.Customizer?.CustomizerLoadingIconColor,
               }}
@@ -63,6 +65,33 @@ const Customizer = () => {
                 handleColorChange(color, "CustomizerLoadingIconColor")
               }
             />
+             <div className="buttonContainer me-3">
+                              <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={handlePickerClose}
+                              >
+                                OK
+                              </button>
+                              <button
+                                type="button"
+                              //set white color
+  
+                                onClick={() =>
+                                  handelchange(
+                                    {
+                                      hex: "#ffffff",
+                                      change: "CustomizerLoadingIconColor",
+                                    }
+                                )
+                              }
+                              
+                                className="btn btn-outline-dark"
+                              >
+                                Cancle
+                              </button>
+                            </div>
+            
           </div>
         )}
       </div>
@@ -99,8 +128,10 @@ const Customizer = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+            className="c1"
               color={{
                 hex: customizerData?.Customizer?.CustomizerBackgroundColor,
               }}
@@ -108,6 +139,30 @@ const Customizer = () => {
                 handleColorChange(color, "CustomizerBackgroundColor")
               }
             />
+            <div className="buttonContainer me-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handlePickerClose}
+              >
+                OK
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  handelchange(
+                    {
+                      hex: "#ffffff",
+                      change: "CustomizerBackgroundColor",
+                    }
+                  )
+                }
+                className="btn btn-outline-dark"
+              >
+                Cancle
+              </button>
+              </div>
+
           </div>
         )}
       </div>

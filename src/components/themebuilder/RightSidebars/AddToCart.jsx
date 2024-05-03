@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useContext } from "react";
-import { ChromePicker } from "react-color";
+import { SketchPicker } from "react-color";
 import ThemeContext from "../../../contexts/ThemeContext";
+
 
 const AddToCart = () => {
   const {
@@ -15,6 +16,15 @@ const AddToCart = () => {
   } = useContext(ThemeContext);
 
   const colorPickerRef = useRef();
+    const handelchange = (
+    { hex,change }) => {
+     handleColorChange(
+       { hex },
+       change
+       );
+       handlePickerClose();
+
+  }
 
   useEffect(() => {
     document.addEventListener("click", handlePickerClose);
@@ -57,8 +67,10 @@ const AddToCart = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+            className="c1"
               color={{
                 hex: customizerData?.AddToCart?.AddToCartBorderColor || "#ffff",
               }} 
@@ -66,6 +78,32 @@ const AddToCart = () => {
                 handleColorChange(color, "AddToCartBorderColor")
               }
             />
+              <div className="buttonContainer me-3">
+                            <button
+                              type="button"
+                              className="btn btn-primary"
+                              onClick={handlePickerClose}
+                            >
+                              OK
+                            </button>
+                            <button
+                              type="button"
+                             //set white color
+
+                              onClick={() =>
+                                handelchange({ 
+                                  hex: "#ffffff",
+                                  change: "AddToCartBorderColor"
+
+                                }
+                              )
+                            }
+                            
+                              className="btn btn-outline-dark"
+                            >
+                              Cancle
+                            </button>
+                          </div>
           </div>
         )}
       </div>
@@ -163,8 +201,10 @@ const AddToCart = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+            className="c1"
               color={{
                 hex: customizerData?.AddToCart?.AddToCartFontColor,
               }}
@@ -172,6 +212,28 @@ const AddToCart = () => {
                 handleColorChange(color, "AddToCartFontColor")
               }
             />
+            <div className="buttonContainer me-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handlePickerClose}
+              >
+                OK
+              </button>
+              <button
+                type="button"
+                //set white color
+                onClick={() =>
+                  handelchange({
+                    hex: "#ffffff",
+                    change: "AddToCartFontColor",
+                  })
+                }
+                className="btn btn-outline-dark"
+              >
+                Cancle
+              </button>
+              </div>
           </div>
         )}
       </div>
@@ -208,8 +270,10 @@ const AddToCart = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+            className="c1"
               color={{
                 hex: customizerData?.AddToCart?.AddToCartBackgroundColor,
               }}
@@ -217,6 +281,28 @@ const AddToCart = () => {
                 handleColorChange(color, "AddToCartBackgroundColor")
               }
             />
+            <div className="buttonContainer me-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handlePickerClose}
+              >
+                OK
+              </button>
+              <button
+                type="button"
+                //set white color
+                onClick={() =>
+                  handelchange({
+                    hex: "#ffffff",
+                    change: "AddToCartBackgroundColor",
+                  })
+                }
+                className="btn btn-outline-dark"
+              >
+                Cancle
+              </button>
+              </div>
           </div>
         )}
       </div>
@@ -253,8 +339,9 @@ const AddToCart = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
               color={{
                 hex: customizerData?.AddToCart?.AddToCartHoverBackgroundColor,
               }}
@@ -262,6 +349,28 @@ const AddToCart = () => {
                 handleColorChange(color, "AddToCartHoverBackgroundColor")
               }
             />
+            <div className="buttonContainer me-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handlePickerClose}
+              >
+                OK
+              </button>
+              <button
+                type="button"
+                //set white color
+                onClick={() =>
+                  handelchange({
+                    hex: "#ffffff",
+                    change: "AddToCartHoverBackgroundColor",
+                  })
+                }
+                className="btn btn-outline-dark"
+              >
+                Cancle
+              </button>
+              </div>
           </div>
         )}
       </div>

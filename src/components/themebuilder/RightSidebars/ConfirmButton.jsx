@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useContext } from "react";
-import { ChromePicker } from "react-color";
+import { SketchPicker } from "react-color";
 import ThemeContext from "../../../contexts/ThemeContext";
 
 const ConfirmButton = () => {
@@ -20,6 +20,15 @@ const ConfirmButton = () => {
       document.removeEventListener("click", handlePickerClose);
     };
   }, []);
+     const handelchange = (
+    { hex,change }) => {
+     handleColorChange(
+       { hex },
+       change
+       );
+       handlePickerClose();
+
+  }
   return (
     <>
       <div className="right_wrapper_title">Confirm Button (mobile)</div>
@@ -57,8 +66,10 @@ const ConfirmButton = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+            className="c1"
               color={{
                 hex: customizerData?.ConfirmButtonMobile
                   ?.ConfirmButtonMobileFontColor,
@@ -67,6 +78,32 @@ const ConfirmButton = () => {
                 handleColorChange(color, "ConfirmButtonMobileFontColor")
               }
             />
+             <div className="buttonContainer me-3">
+                            <button
+                              type="button"
+                              className="btn btn-primary"
+                              onClick={handlePickerClose}
+                            >
+                              OK
+                            </button>
+                            <button
+                              type="button"
+                             //set white color
+
+                              onClick={() =>
+                                handelchange(
+                                  {
+                                    hex: "#ffffff",
+                                    change: "ConfirmButtonMobileFontColor",
+                                  }
+                              )
+                            }
+                            
+                              className="btn btn-outline-dark"
+                            >
+                              Cancle
+                            </button>
+                          </div>
           </div>
         )}
       </div>
@@ -107,8 +144,10 @@ const ConfirmButton = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+            className="c1"
               color={{
                 hex: customizerData?.ConfirmButtonMobile
                   ?.ConfirmButtonMobileBackgroundColor,
@@ -117,6 +156,32 @@ const ConfirmButton = () => {
                 handleColorChange(color, "ConfirmButtonMobileBackgroundColor")
               }
             />
+              <div className="buttonContainer me-3">
+                              <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={handlePickerClose}
+                              >
+                                OK
+                              </button>
+                              <button
+                                type="button"
+                              //set white color
+  
+                                onClick={() =>
+                                  handelchange(
+                                    {
+                                      hex: "#ffffff",
+                                      change: "ConfirmButtonMobileBackgroundColor",
+                                    }
+                                )
+                              }
+                              
+                                className="btn btn-outline-dark"
+                              >
+                                Cancle
+                              </button>
+                            </div>
           </div>
         )}
       </div>

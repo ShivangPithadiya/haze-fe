@@ -116,6 +116,8 @@ useEffect(() => {
   };
   const handleTitleKeyPress = (e) => {
     setTitleKeypress(e.target.value);
+
+
   };
   const handleCreateColorLayer = (e, el) => {
     createImageColorLayer(e, el);
@@ -193,6 +195,10 @@ useEffect(() => {
 
   const handleTitle = (e) => {
     setTitle(e.target.value);
+     const activeLayer = ProductCustomizer?.activeLayerId;
+      const updatedData = { imageTitle: e.target.value};
+
+      dispatch(setUpdateLayerData({ activeLayer, updatedData }));
   };
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -287,7 +293,9 @@ useEffect(() => {
               height: "100%",
             }}
           ></div>
-          <span class="file_select_title">Untitled Color</span>
+          <input class="file_select_title" style={{border:"none",height:"28px"}} value={titleKeyPress}  onChange={handleTitleKeyPress} type="text"  
+          placeholder="Untiteld Colour"
+          />
           <span class="file_select_icon">
             <button type="button" className="" onClick={handleShow}>
               <svg
@@ -350,7 +358,7 @@ useEffect(() => {
                     <input
                       className="image_title px-2"
                       type="text"
-                      placeholder="Untitled Layer"
+                      placeholder="Untitled Colour"
                       onChange={handleTitleKeyPress}
                     />
                   </div>

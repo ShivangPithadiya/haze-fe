@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useContext } from "react";
-import { ChromePicker } from "react-color";
+import { SketchPicker } from "react-color";
 import ThemeContext from "../../../contexts/ThemeContext";
 
 const OutOfStock = () => {
@@ -20,6 +20,15 @@ const OutOfStock = () => {
       document.removeEventListener("click", handlePickerClose);
     };
   }, []);
+    const handelchange = (
+    { hex,change }) => {
+     handleColorChange(
+       { hex },
+       change
+       );
+       handlePickerClose();
+
+  }
   return (
     <>
       <div className="right_wrapper_title">Out of Stock</div>
@@ -56,8 +65,10 @@ const OutOfStock = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+              className="c1"
               color={{
                 hex: customizerData?.OutOfStock?.OutOfStockBadgeIconColor,
               }}
@@ -65,6 +76,30 @@ const OutOfStock = () => {
                 handleColorChange(color, "OutOfStockBadgeIconColor")
               }
             />
+             <div className="buttonContainer me-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handlePickerClose}
+              >
+                OK
+              </button>
+              <button
+                type="button"
+                //set white color
+                onClick={() =>
+                  handelchange({
+                    hex: "#000000",
+                    change: "OutOfStockBadgeIconColor",
+                  })
+                }
+                className="btn btn-outline-dark"
+              >
+                Cancle
+              </button>
+
+              </div>
+
           </div>
         )}
       </div>
@@ -105,8 +140,10 @@ const OutOfStock = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+              className="c1"
               color={{
                 hex: customizerData?.OutOfStock?.OutOfStockBadgeBackgroundColor,
               }}
@@ -114,6 +151,29 @@ const OutOfStock = () => {
                 handleColorChange(color, "OutOfStockBadgeBackgroundColor")
               }
             />
+              <div className="buttonContainer me-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handlePickerClose}
+              >
+                OK
+              </button>
+              <button
+                type="button"
+                //set white color
+                onClick={() =>
+                  handelchange({
+                    hex: "#000000",
+                    change: "OutOfStockBadgeBackgroundColor",
+                  })
+                }
+                className="btn btn-outline-dark"
+              >
+                Cancle
+              </button>
+
+              </div>
           </div>
         )}
       </div>
@@ -169,8 +229,10 @@ const OutOfStock = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+              className="c1"
               color={{
                 hex: customizerData.OutOfStock.OutOfStockBadgeBorderColor,
               }}
@@ -178,6 +240,29 @@ const OutOfStock = () => {
                 handleColorChange(color, "OutOfStockBadgeBorderColor")
               }
             />
+              <div className="buttonContainer me-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handlePickerClose}
+              >
+                OK
+              </button>
+              <button
+                type="button"
+                //set white color
+                onClick={() =>
+                  handelchange({
+                    hex: "#000000",
+                    change: "OutOfStockBadgeBorderColor",
+                  })
+                }
+                className="btn btn-outline-dark"
+              >
+                Cancle
+              </button>
+
+              </div>
           </div>
         )}
       </div>
@@ -214,15 +299,40 @@ const OutOfStock = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+              className="c1"
               color={{
                 hex: customizerData?.OutOfStock?.OutOfStockBannerTextColor,
               }}
+
               onChange={(color) =>
                 handleColorChange(color, "OutOfStockBannerTextColor")
               }
             />
+              <div className="buttonContainer me-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handlePickerClose}
+              >
+                OK
+              </button>
+              <button
+                type="button"
+                //set white color
+                onClick={() =>
+                  handelchange({
+                    hex: "#000000",
+                    change: "OutOfStockBannerTextColor",
+                  })
+                }
+                className="btn btn-outline-dark"
+              >
+                Cancle
+              </button>
+              </div>
           </div>
         )}
       </div>
@@ -263,8 +373,10 @@ const OutOfStock = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+              className="c1"
               color={{
                 hex: customizerData?.OutOfStock
                   ?.OutOfStockBannerBackgroundColor,
@@ -273,6 +385,28 @@ const OutOfStock = () => {
                 handleColorChange(color, "OutOfStockBannerBackgroundColor")
               }
             />
+              <div className="buttonContainer me-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handlePickerClose}
+              >
+                OK
+              </button>
+              <button
+                type="button"
+                //set white color
+                onClick={() =>
+                  handelchange({
+                    hex: "#000000",
+                    change: "OutOfStockBannerBackgroundColor",
+                  })
+                }
+                className="btn btn-outline-dark"
+              >
+                Cancle
+              </button>
+              </div>
           </div>
         )}
       </div>

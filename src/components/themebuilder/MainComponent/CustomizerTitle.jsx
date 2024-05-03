@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import ThemeContext from "../../../contexts/ThemeContext";
 
-const CustomizerTitle = () => {
+const CustomizerTitle = ({ layerData }) => {
   const { customizerData } = useContext(ThemeContext);
   const [isMobile, setIsMobile] = useState(false);
   const [customizerTitleStyle, setCustomizerTitleStyle] = useState({});
@@ -29,7 +29,7 @@ const CustomizerTitle = () => {
         className="products_wrapper_tile caption-top  col_padding"
         style={customizerTitleStyle}
       >
-        Product 1
+      { layerData?.title }
       </div>
     </>
   );

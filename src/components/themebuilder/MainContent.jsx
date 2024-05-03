@@ -9,9 +9,11 @@ import PreviousArrow from "./MainComponent/Arrows/PreviousArrow";
 import CustomDots from "./MainComponent/CustomDots";
 import CustomizerTitle from "./MainComponent/CustomizerTitle";
 import AddToCart from "./MainComponent/AddToCart";
+import axios from "axios";
 import Zoom from "./MainComponent/Zoom";
 import ShareButton from "./MainComponent/ShareButton";
 import { useSelector } from "react-redux";
+import { last } from "lodash";
 
 var settings = {
   dots: true,
@@ -37,7 +39,8 @@ const MainContent = () => {
   const [accordionOneOpen, setAccordionOneOpen] = useState(false);
   const [accordionTwoOpen, setAccordionTwoOpen] = useState(false);
   const [accordionThreeOpen, setAccordionThreeOpen] = useState(false);
-
+  const [SeletedLayer, setSeletedLayer] = useState([]);
+  
 
   const viewport = useSelector(state => state.customizeProduct.viewport);
 
@@ -58,6 +61,48 @@ const MainContent = () => {
     setAccordionOneOpen(false);
     setAccordionTwoOpen(false);
   };
+  const handelimageclick = (index) => {
+    
+  
+    setSeletedLayer([layerData.layerdata[index]]);
+  
+  };
+
+const handleColourclik = async (color) => {
+  try {
+  
+    const layerId = SeletedLayer[0].layerId;
+   
+    const colortoapply = color.color.replace('#', '');
+    console.log('Color to apply:', colortoapply);
+
+    const coloredImages = await Promise.all(
+      SeletedLayer[0].images.map(async (image) => {
+        const lastPart = image.url.split('/').pop();
+     
+        const transformedURL = await axios.get(`https://res.cloudinary.com/dmew5rudk/image/upload/e_gen_recolor:prompt_image;to-color_${colortoapply}/${lastPart}`);
+       console.log('Transformed URL:', transformedURL.config.url);
+        return transformedURL.config.url;
+      })
+    );
+
+
+    setSeletedLayer(prevState => {
+     
+      const updatedImages = prevState[0].images.map((image, index) => ({
+        ...image,
+        url: coloredImages[index], 
+      }));
+      console.log('Updated images:', updatedImages);  
+      return [{
+        ...prevState[0],
+        images: updatedImages,
+      }];
+    });
+  } catch (error) {
+    console.error('Error applying color:', error);
+  }
+};
 
   useEffect(() => {
     setCustomizerLayerPanel({
@@ -92,6 +137,36 @@ const MainContent = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+  
+const [layerData, setLayerData] = useState(null);
+const [prevProductId, setPrevProductId] = useState(null);
+
+useEffect(() => {
+  const fetchData = async () => {
+    const id = localStorage.getItem('selectedProductId');
+    if (!id || id === prevProductId) return; // Exit if there's no change in product ID
+
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_APP_API_URL}/data/layerdata/${id}`);
+      setLayerData(res.data);
+      setPrevProductId(id); // Update prevProductId after successful fetch
+    } catch (error) {
+      console.error('Error fetching layer data:', error);
+    }
+  };
+
+  fetchData(); // Initial fetch
+
+  const intervalId = setInterval(fetchData, 1000); // Check every second for changes in local storage
+
+  return () => clearInterval(intervalId);
+}, [prevProductId]); // Watch for changes in prevProductId
+
+console.log('Layer Data:', layerData);
+
+
+
+
   return (
     <>
       <div className="center_wrapper">
@@ -101,68 +176,52 @@ const MainContent = () => {
               {customizerLayerPanel?.PanelPosition === "left" && (
                 <>
                   <div className="products_col prod_col" style={customizerLayerPanel}>
-                    <CustomizerTitle />
-                    <div
-                      className="products_wrapper_tag  col_padding"
-                      style={customizerLayerList}
-                    >
-                      Mug
-                    </div>
-                    <div className="products_wrapper_row">
-                      <div className="products_wrapper_col">
-                        <div className="products-active products_wrapper_image">
-                          <img src="/assets/Image/product/mug.svg" />
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      className="products_wrapper_tag"
-                      style={customizerLayerList}
-                    >
-                      Mug Colour
-                    </div>
-                    <div className="products_wrapper_row">
-                      <div className="products_wrapper_col">
-                        <div className="products_colour_section">
-                          <span className="products-active"></span>
-                          <span>
-                            <svg
-                              width="14"
-                              height="14"
-                              viewBox="0 0 14 14"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <rect
-                                width="100%"
-                                height="100%"
-                                fill={customizerOutOfStock.iconBackgroundColor}
-                              />
-                              <path
-                                d="M7 0C3.14012 0 0 3.14012 0 7C0 10.8599 3.14012 14 7 14C10.8599 14 14 10.8599 14 7C14 3.14012 10.8599 0 7 0ZM7 1.35484C8.31269 1.35484 9.5191 1.80902 10.479 2.56334L2.56326 10.4789C1.80899 9.51902 1.35484 8.31264 1.35484 7C1.35484 3.88722 3.88722 1.35484 7 1.35484ZM7 12.6452C5.68736 12.6452 4.48101 12.191 3.52117 11.4368L11.4369 3.52128C12.1911 4.4811 12.6452 5.68742 12.6452 7C12.6452 10.1128 10.1128 12.6452 7 12.6452Z"
-                                fill={customizerOutOfStock.fillColor}
-                              />
-                            </svg>
-                          </span>
-                          <span></span>
-                          <span></span>
-                          <span></span>
-                          <span></span>
-                          <span></span>
-                          <span></span>
-                          <span></span>
-                          <span></span>
-                        </div>
-                      </div>
-                      <div className="products_wrapper_tag">Handle</div>
-                    </div>
-                    <div className="products_wrapper_row">
-                      <div className="products_wrapper_col">
-                        <div className="products-active products_wrapper_image">
-                          <img src="/assets/Image/product/mug-handle.svg" />
-                        </div>
-                      </div>
-                    </div>
+                   <CustomizerTitle layerData={layerData} />
+                   
+
+ {layerData?.layerdata.map((layer, index)  => (
+  <>
+    {layer?.dispalyType === "Image" && (
+      <>
+        <div className="products_wrapper_row">
+          <div className="products_wrapper_col">
+            <div className="products-active products_wrapper_image" onClick={()=>handelimageclick(index)}>
+              <img src={layer?.Thumbailimage} alt="image" width={40} />
+            </div>
+          </div>
+        </div>
+      </>
+    )}
+   {layer?.dispalyType === "Colour" && (
+      <>
+        <div className="products_wrapper_tag" style={customizerLayerList}>
+       {layer.imageTitle}
+        </div>
+        <div className="products_wrapper_row">
+          <div className="products_wrapper_col">
+            <div className="products_colour_section">
+              {layer.colours.map((color, index) => (
+                <span
+                  key={index}
+                  className="products-active"
+                  style={{ backgroundColor: color.color }}
+                  onClick={() => handleColourclik(color)}
+                ></span>
+              ))}
+            </div>
+          </div>
+         
+        </div>
+      </>
+    )}
+  </>
+
+  
+))}
+
+                 
+                   
+                   
                   </div>
 
                   <div className="products_col">
@@ -179,14 +238,19 @@ const MainContent = () => {
                       </div>
                     </div>
                     <div className="products_slid">
-                      <Slider {...settings}>
-                        <div className="mb-3">
-                          <img src="/assets/Image/product/mug.png" />
-                        </div>
-                        <div>
-                          <img src="/assets/Image/product/mug.png" className="p-2"/>
-                        </div>
-                      </Slider>
+                      {
+                        SeletedLayer.map((layer, index) => (
+
+                          <Slider {...settings} key={index}>
+                            {layer.images.map((image, index) => (
+                              <div key={index}>
+                                <img src={image.url} alt="image" />
+                              </div>
+                            ))}
+
+                          </Slider>
+                        ))
+                      }
                     </div>
                     <AddToCart />
                   </div>

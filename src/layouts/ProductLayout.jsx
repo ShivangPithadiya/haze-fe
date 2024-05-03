@@ -1,7 +1,8 @@
 import React from 'react';
 import Header from "../pages/ProductCustomizer/Header.jsx"
 import Sidebar from '../pages/ProductCustomizer/Sidebar.jsx';
-import RightSidebar from "../pages/ProductCustomizer/RightSiderbar/RightSidebar.jsx"
+import RightSidebar from "../pages/ProductCustomizer/RightSiderbar/RightSidebar.jsx";
+import ProductDetails from '../pages/ProductCustomizer/PricingDetails.jsx'
 const ProductLayout = ({ children }) => {
 	return (
 		<>

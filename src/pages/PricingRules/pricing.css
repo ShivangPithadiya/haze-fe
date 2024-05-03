@@ -1,0 +1,68 @@
+.main_container_pricing {
+    border: 1px solid #999898;
+}
+
+.main_container_pricing select {
+    border: 1px solid #9C9C9C;
+    color: #737373;
+}
+
+.main_container_pricing .advanced_pricing p {
+    color: #737373;
+
+}
+
+.main_container_pricing .border {
+    border: 1px solid #9C9C9C !important;
+}
+
+/* toggle css */
+/* Custom styles for the toggle switch */
+.custom-toggle {
+    position: relative;
+    display: inline-block;
+    /* width: 60px;
+    height: 34px; */
+}
+
+/* Hide the default checkbox */
+.custom-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Style the toggle switch background */
+.custom-toggle .toggle-background {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: white;
+    /* White background */
+    border-radius: 34px;
+    /* Rounded corners */
+    border: 1px solid #FF0F7B;
+    transition: background-color 0.4s;
+    width: 33px;
+    height: 16px;
+}
+
+/* Style the circle handle */
+.custom-toggle .toggle-handle {
+    position: absolute;
+    top: 0px;
+    left: -10px;
+    width: 14px;
+    height: 14px;
+    background: linear-gradient(90deg, #FF0F7B 0%, #F8932D 100%);
+    border-radius: 50%;
+    /* Circle shape */
+    transition: transform 0.4s;
+}
+/* Move the circle handle based on checkbox state */
+.custom-toggle input:checked+.toggle-background .toggle-handle {
+    transform: translateX(26px);
+}

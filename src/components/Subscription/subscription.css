@@ -1,0 +1,27 @@
+table tr {
+    border-bottom: 1px solid #737373;
+}
+
+.t_head th {
+    font-weight: 500 !important;
+}
+
+table tr {
+    font-size: 12px;
+}
+
+.order_search_btn span {
+    color: #D9D9D9;
+}
+.order_search_btn{
+    width: 250px;
+    padding-left: 10px;
+    margin-right: 10px;
+}
+.sort_input{
+    width: 120px;
+}
+.active_deactive button{
+    font-weight: 400;
+    font-size: 12px;
+}

@@ -1,6 +1,11 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const PrintingMethods = () => {
+  const navigate = useNavigate();
+  const handleAdd = () => {
+    navigate('/printing-methods-add')
+  }
   return (
     <div className="left_wrapper">
       <div className="wrapper_header">
@@ -52,7 +57,7 @@ const PrintingMethods = () => {
                 There’s no printing method decided, yet
               </div>
               <div className="wraper_button_section">
-                <button className="add_button ">+ Add Printing Method</button>
+                <button className="add_button" onClick={() => handleAdd()}>+ Add Printing Method</button>
               </div>
             </div>
           </div>

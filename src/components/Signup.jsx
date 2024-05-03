@@ -31,7 +31,7 @@ const Signup = ({ handleChange }) => {
       }
 
       const response = await axios.post(
-        "http://ec2-52-6-145-35.compute-1.amazonaws.com:5001/api/auth/register",
+        `${import.meta.env.VITE_APP_API_URL}/auth/register`,
         {
           name,
           email,

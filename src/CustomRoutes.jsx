@@ -27,6 +27,12 @@ const CustomRoutes = [
     exact: true,
   },
   {
+    path: '/product-pricing-details',
+    layout: Layout.PricingDetailsLayout,
+    component: Page.PricingDetails,
+    exact: true,
+  },
+  {
     path: '/product-preview',
     layout: Layout.PreviewLayout,
     component: Page.AddImage,
@@ -38,6 +44,12 @@ const CustomRoutes = [
     exact: true,
     layout: Layout.DefaultLayout,
     component: Page.PrintingMethods,
+  },
+  {
+    path: "/printing-methods-add",
+    exact: true,
+    layout: Layout.PrintingLayout,
+    component: Page.PrintingMethodsAdd,
   },
   {
     path: "/theme-builder",
@@ -58,10 +70,28 @@ const CustomRoutes = [
     component: Page.PricingRules,
   },
   {
+    path: "/pricing-rules-simple-pricing",
+    exact: true,
+    layout: Layout.SimplePricingLayout,
+    component: Page.SimplePricing,
+  },
+  {
+    path: "/pricing-rules-advanced-pricing",
+    exact: true,
+    layout: Layout.AdvancedPricingLayout,
+    component: Page.AdvancedPricing,
+  },
+  {
     path: "/my-products",
     exact: true,
     layout: Layout.DefaultLayout,
     component: Page.MyProducts,
+  },
+  {
+    path: "/subscriptions",
+    exact: true,
+    layout: Layout.DefaultLayout,
+    component: Page.Subscriptions,
   },
   {
     path: "/orders",

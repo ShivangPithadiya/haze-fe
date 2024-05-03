@@ -44,9 +44,7 @@
   height: 100%;
 }
 
-.order_inner_col:nth-child(2) {
-  margin-left: var(--font-size-21xl);
-}
+
 
 .order_input ::placeholder {
   color: rgba(217, 217, 217, 0.6);
@@ -80,33 +78,28 @@
   margin: 10px 0;
 }
 
-.order_data_table thead th:nth-child(1) {
-  width: 20%;
-}
-
-.order_data_table thead th:nth-child(2),
-.order_data_table thead th:nth-child(3) {
-  width: 15%;
-}
-
-.order_data_table thead th:nth-child(4) {
-  width: 40%;
-}
-
-.order_data_table thead th:nth-child(5) {
+.order_data_table thead th{
+  text-align: start;
+  align-items: center;
   width: 10%;
 }
 
-.order_data_table {
-  /* Other styles for your table */
-}
+
+
+
 
 .order_data_table th,
 .order_data_table td {
   padding: 8px;
-  text-align: left;
+  text-align: start;
   vertical-align: top;
   /* Align text to the top */
+}
+ul{
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+
 }
 
 /* order html end */

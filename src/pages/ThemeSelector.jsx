@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ThemeSelector.css";
 import Slider from "react-slick";
-
+import axios from "axios";
 function SampleNextArrow(props) {
   const { className, style, onClick } = props;
+
+  
   return (
     <div
       className={className}

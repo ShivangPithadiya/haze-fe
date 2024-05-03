@@ -1,0 +1,102 @@
+.modalContainer {
+    padding-left: 17px;
+}
+
+.modalContent {
+    border-radius: 16px;
+    background-color: #ffffff;
+}
+
+.modalHeader {
+    border-bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modalTitle {
+    margin-bottom: 0;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+}
+
+.modalBody {
+    padding: 20px;
+}
+
+.productRow {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.productImage {
+    width: 25%;
+}
+
+.imageFluid {
+    width: 100%;
+    border-radius: 0.25rem;
+}
+
+.productDetails {
+    width: 45%;
+}
+
+.productName {
+    margin-bottom: 0;
+}
+
+.quantityControl {
+    display: flex;
+    align-items: center;
+}
+
+.quantityButton {
+    background: none;
+    border: none;
+}
+
+.quantityInput {
+    width: 50px;
+    text-align: center;
+}
+
+.productQty {
+    width: 10%;
+}
+
+.qtyInput {
+    width: 50px;
+    text-align: center;
+}
+
+.productPrice {
+    width: 20%;
+}
+
+.price {
+    margin-bottom: 0;
+}
+
+.totalPrice {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.totalPriceSpan {
+    font-weight: bold;
+}
+
+.modalFooter {
+    border-top: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.footerButton {
+    width: 45%;
+}

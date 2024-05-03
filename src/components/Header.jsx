@@ -17,16 +17,16 @@ const Header = ({ openNav }) => {
     localStorage.clear();
     window.history.replaceState({}, document.title, window.location.pathname);
   };
- 
+
   return (
     <header className="Haze_header">
       <div className="logo">
-        <img  className="menubaricon" onClick={openNav} src="assets/Image/menubar.svg"/>
-        <a href="#"><img src="assets/Image/hazelogo.svg"/></a>
+        <img className="menubaricon" onClick={openNav} src="assets/Image/menubar.svg" />
+        <a href="/dashboard"><img src="assets/Image/hazelogo.svg" /></a>
       </div>
       <nav className="nav_bar">
         <ul className="nav_menu">
-          <li className="nav_list"> Help Center</li>
+          {user.userType === 'super-admin' ? <></> : <li className="nav_list"> Help Center</li>}
           <li className="nav_list" onClick={handelLogout}>Logout</li>
         </ul>
       </nav>

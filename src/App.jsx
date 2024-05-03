@@ -1,6 +1,6 @@
 import "./App.css";
 import CustomRoutes from "./CustomRoutes";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom"; // Import Link from react-router-dom
 
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";

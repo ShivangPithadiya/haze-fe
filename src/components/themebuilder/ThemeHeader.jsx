@@ -5,12 +5,30 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { setViewport } from "../../features/customizeProductSlice";
 import { useDispatch, useSelector } from "react-redux";
-const ThemeHeader = () => {
+import  "../themebuilder/RightSidebars/CustomizerTitleList.css";
+const ThemeHeader = ( ) => {
   const { customizerData, updateCustomizerData } = useContext(ThemeContext);
   const [selectProduct, setSelectProduct] = ("")
+
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const selectedTheme = queryParams.get("selectedTheme");
+
+    const [layerData, setLayerData] = useState([]);
+  useEffect(() => {
+    const fetchlayerDatabyid = async () => {
+      const res = await axios.get(`${import.meta.env.VITE_APP_API_URL}/data/layerdata`);
+      setLayerData(res.data);
+    
+  
+      
+    }
+    fetchlayerDatabyid();
+  },  []
+  )
+
+
+console.log("layerData", layerData)
 
   const dispatch = useDispatch();
 
@@ -75,32 +93,53 @@ const ThemeHeader = () => {
   };
   console.log("products",products);*/
 
-  useEffect(() => {
-    fetchData()
-  }, [])
-  const fetchData = async () => {
-    const token = localStorage.getItem('token')
-    try {
-      const response = await axios.get(
-        'http://ec2-52-6-145-35.compute-1.amazonaws.com:5001/api/product/getAll',
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      )
-      console.log(response, "response.data.products")
-      setSelectProduct(response.data.products);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
-  };
+  // useEffect(() => {
+  //   fetchData()
+  // }, [])
+  // const fetchData = async () => {
+  //   const token = localStorage.getItem('token')
+  //   try {
+  //     const response = await axios.get(
+  //       `${import.meta.env.VITE_APP_API_URL}/api/product/getAll`,
+  //       {
+  //         headers: {
+  //           'Authorization': `Bearer ${token}`,
+  //         },
+  //       }
+  //     )
+  //     console.log(response, "response.data.products")
+  //     // setSelectProduct(response.data.products);
+  //   } catch (error) {
+  //     console.error('Error fetching products:', error);
+  //   }
+  // };
 
-
+const handleSelectChange = (event) => {
+  const selectedProductId = event.target.value;
+  localStorage.setItem('selectedProductId', selectedProductId);
+};
   const handleDiscard = () => {
     navigate(`/my-products`)
   }
   const handleSaveThemeCustomizerData = () => {
+    
+  
+const authToken =localStorage.getItem('token');
+
+axios.post(`${import.meta.env.VITE_APP_API_URL}/data/customizer`, customizerData, {
+  headers: {
+    Authorization: `Bearer ${authToken}`
+  }
+})
+.then((response) => {
+  console.log("Sending data ", response.data);
+})
+.catch((error) => {
+  console.error("Error sending data :", error);
+});
+
+
+
 
   }
 
@@ -128,14 +167,13 @@ const ThemeHeader = () => {
 
         <div className="Select_Product_button">
           <div className="custom-select">
-            <select>
-              <option value="none" selected disabled hidden>Select Product</option>
-              {selectProduct && selectProduct.map((product, index) => (
-                <>
-                  <option key={index} value="0">{product.data}</option>
-                </>
-              ))}
-            </select>
+           <select onChange={handleSelectChange}>
+  <option value="none" disabled hidden>Select Product</option>
+   <option  value="none" disabled selected>Select Product</option>
+  {layerData.map((product) => (
+    <option key={product._id} value={product._id}>{product.title}</option>
+  ))}
+</select>
           </div>
         </div>
 
@@ -143,24 +181,24 @@ const ThemeHeader = () => {
         {/* viewport section */}
         <div className="viewport_product">
           {/* <div className="dropdown"> */}
-          <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
-              <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5M12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0M1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1M1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25" />
-            </svg>
-          </button>
-          <ul className="dropdown-menu">
-            <li>
-              <a className="dropdown-item" href="#" onClick={() => { console.log("clicked"); dispatch(setViewport(false)) }}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
-                  <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5M12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0M1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1M1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25" />
-                </svg>
-              </a>
-            </li>
-            <li><a className="dropdown-item" href="#" onClick={() => { console.log("clicked"); dispatch(setViewport(true)) }}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-phone" viewBox="0 0 16 16">
-              <path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
-              <path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
-            </svg></a></li>
-          </ul>
+            <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
+                <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5M12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0M1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1M1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25" />
+              </svg>
+            </button>
+            <ul className="dropdown-menu">
+              <li>
+                <a className="dropdown-item" href="#" onClick={() => { console.log("clicked"); dispatch(setViewport(false)) }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
+                    <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5M12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0M1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1M1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25" />
+                  </svg>
+                </a>
+              </li>
+              <li><a className="dropdown-item" href="#" onClick={() => { console.log("clicked"); dispatch(setViewport(true)) }}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-phone" viewBox="0 0 16 16">
+                <path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
+                <path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
+              </svg></a></li>
+            </ul>
           {/* </div> */}
         </div>
 

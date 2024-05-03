@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useContext } from "react";
-import { ChromePicker } from "react-color";
+import { SketchPicker } from "react-color";
 import ThemeContext from "../../../contexts/ThemeContext";
 
 const Price = () => {
@@ -20,6 +20,15 @@ const Price = () => {
       document.removeEventListener("click", handlePickerClose);
     };
   }, []);
+    const handelchange = (
+    { hex,change }) => {
+     handleColorChange(
+       { hex },
+       change
+       );
+       handlePickerClose();
+
+  }
   return (
     <>
       <div className="right_wrapper_title">Price</div>
@@ -139,13 +148,39 @@ const Price = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+            className="c1"
               color={{
                 hex: customizerData?.Price?.PriceFontColour,
               }}
               onChange={(color) => handleColorChange(color, "PriceFontColour")}
             />
+              <div className="buttonContainer me-3">
+                            <button
+                              type="button"
+                              className="btn btn-primary"
+                              onClick={handlePickerClose}
+                            >
+                              OK
+                            </button>
+                            <button
+                              type="button"
+                             //set white color
+
+                              onClick={() =>
+                                handelchange({ 
+                                  hex: "#000000",
+                                  change:"PriceFontColour"
+                                })
+                            }
+                            
+                              className="btn btn-outline-dark"
+                            >
+                              Cancle
+                            </button>
+                          </div>  
           </div>
         )}
       </div>
@@ -205,8 +240,10 @@ const Price = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+            className="c1"
               color={{
                 hex: customizerData?.Price?.PriceExtraPriceFontColor,
               }}
@@ -214,6 +251,29 @@ const Price = () => {
                 handleColorChange(color, "PriceExtraPriceFontColor")
               }
             />
+
+            <div className="buttonContainer me-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handlePickerClose}
+              >
+                OK
+              </button>
+              <button
+                type="button"
+                //set white color
+                onClick={() =>
+                  handelchange({ 
+                    hex: "#000000",
+                    change:"PriceExtraPriceFontColor"
+                  })
+              }
+                className="btn btn-outline-dark"
+              >
+                Cancle
+              </button>
+              </div>
           </div>
         )}
       </div>
@@ -250,8 +310,10 @@ const Price = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+            className="c1"
               color={{
                 hex: customizerData?.Price?.PriceExtraPriceBorderColor,
               }}
@@ -259,6 +321,28 @@ const Price = () => {
                 handleColorChange(color, "PriceExtraPriceBorderColor")
               }
             />
+            <div className="buttonContainer me-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handlePickerClose}
+              >
+                OK
+              </button>
+              <button
+                type="button"
+                //set white color
+                onClick={() =>
+                  handelchange({ 
+                    hex: "#000000",
+                    change:"PriceExtraPriceBorderColor"
+                  })
+              }
+                className="btn btn-outline-dark"
+              >
+                Cancle
+              </button>
+              </div>
           </div>
         )}
       </div>
@@ -300,8 +384,10 @@ const Price = () => {
             ref={colorPickerRef}
             onClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", zIndex: 2 }}
+            className="colorPickerContainer"
           >
-            <ChromePicker
+            <SketchPicker
+            className="c1"
               color={{
                 hex: customizerData?.Price?.PriceExtraPriceBackgroundColor,
               }}
@@ -309,6 +395,28 @@ const Price = () => {
                 handleColorChange(color, "PriceExtraPriceBackgroundColor")
               }
             />
+            <div className="buttonContainer me-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handlePickerClose}
+              >
+                OK
+              </button>
+              <button
+                type="button"
+                //set white color
+                onClick={() =>
+                  handelchange({ 
+                    hex: "#000000",
+                    change:"PriceExtraPriceBackgroundColor"
+                  })
+              }
+                className="btn btn-outline-dark"
+              >
+                Cancle
+              </button>
+              </div>
           </div>
         )}
       </div>

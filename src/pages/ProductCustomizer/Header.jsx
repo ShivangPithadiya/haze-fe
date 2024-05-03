@@ -8,73 +8,36 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
-import svg1 from "../../assets/Image/hazelogo.svg";
 import axios from "axios"
 const Header = () => {
 	const productCustomizerData = useSelector((state) => state.customizeProduct);
 	const product_name = useSelector((state) => state.customizeProduct.product_name);
+	const Data = useSelector((state) => state.customizeProduct.layerData);
+	const [Layer, setLayer] = useState(Data);
 	const [isPopupOpen, setPopupOpen] = useState(false);
 	const [isDropdownOpen, setDropdownOpen] = useState(false);
 	const [showModal, setShowModal] = useState(false);
+	const [showResetModal, setShowResetModal] = useState(false);
+	const [showModal1, setShowModal1] = useState(false);
 	const navigate = useNavigate();
+	const [layerData, setLayerData] = useState();
 
-	const [layerData, setLayerData] = useState({
-		layerId: "",
-		inputType: "",
-		displayType: "",
-		title: "",
-		thumbnailType: Boolean,
-		labelType: Boolean,
-		imageName: "",
-		images: [
-			{
-				id: "",
-				layerId: "",
-				imageName: "",
-				url: ""
-			},
-			{
-				id: "",
-				layerId: "",
-				imageName: "",
-				url: ""
-			}
-		],
-		colors: [
-			{
-				id: "",
-				layerId: "",
-				colorName: "",
-				color: ""
-			}
-		],
-		textName: "",
-		text: [
-			{
-				id: "",
-				layerId: "",
-				textName: "",
-				imageText: ""
-			}
-		]
-	})
+	useEffect(() => {
+		setLayerData(Data);
+		setLayer(Data)
+	}, [Data]);
 
 	const togglePopup = () => {
 		setPopupOpen(!isPopupOpen);
 	};
-
 	const toggleDropdown = () => {
 		setDropdownOpen(!isDropdownOpen);
 	};
 	const handlePriview = () => {
 		const url = "/product-preview";
-
 		window.open(url, "_blank");
 		window.location.reload();
-
 	}
-
-
 	const product = {
 		"id": productCustomizerData.activeLayerId,
 		"title": product_name, //In UI also it is static
@@ -189,72 +152,175 @@ const Header = () => {
 	const handlePublishToast = () => {
 		toast.success("The draft was successfully published!");
 	}
+	const PublishProduct = async () => {
 
-	const PublishProduct = () => {
+		if (!product_name.trim()) {
+
+			alert("Please fill in the product name.");
+			return;
+		}
 		const updatedLayerData = {
-			...layerData,
+			title: product_name,
+			layerdata: Layer.map(layer => ({ ...layer })) // Create a shallow copy of each layer object
 		};
-		console.log("layerdata", layerData);
-		axios.post('http://ec2-52-6-145-35.compute-1.amazonaws.com:5001/api/data/layerdata', updatedLayerData)
+		setShowModal1(true);
+		// Iterate through layers
+		for (const layer of updatedLayerData.layerdata) {
+			// Check if display type is image
+			if (layer.dispalyType === "Image") {
+				console.log("Image Thumbnail:", layer.Thumbailimage);
+				console.log("Images:", layer.images);
+				// Upload thumbnail image to Cloudinary and update URL
+				try {
+					const thumbnailUrl = await imgToCloudinary(layer.Thumbailimage);
+					layer.Thumbailimage = thumbnailUrl; // Update thumbnail URL in copied layer object
+					console.log("Thumbnail uploaded to Cloudinary:", thumbnailUrl);
+				} catch (error) {
+					// Handle error
+					console.error("Error uploading thumbnail to Cloudinary:", error);
+				}
+				// Upload each image in layer.images to Cloudinary and update the array
+				layer.images = await Promise.all(layer.images.map(async (image) => {
+					try {
+						const imageUrl = await imgToCloudinary(image.url);
+						return { ...image, url: imageUrl }; // Create a new object with updated URL
+					} catch (error) {
+						// Handle error
+						console.error("Error uploading image to Cloudinary:", error);
+						return image; // Return the original image object if an error occurs
+					}
+				}));
+				console.log("Images uploaded to Cloudinary:", layer.images);
+			}
+		}
+		console.log("updatedLayerData", updatedLayerData);
+		axios.post(`${import.meta.env.VITE_APP_API_URL}/data/layerdata`,
+
+		 updatedLayerData)
 			.then((response) => {
 				console.log("Data sent successfully to layerdata:", response.data);
-
-				axios
-					.post("http://ec2-52-6-145-35.compute-1.amazonaws.com:5001/api/shopify/products", product)
+		const shopifyStoredomain = "hazetest.myshopify.com";
+        const shopifyaccesstoken = "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";
+				axios.post(`${import.meta.env.VITE_APP_API_URL}/shopify/products`,
+				{
+                    headers: {
+                       "shopifyStoredomain": `${shopifyStoredomain}`,
+                        "shopifyaccesstoken": `${shopifyaccesstoken}`,
+                    },
+                }
+				, product)
 					.then((response) => {
-						console.log("shop before");
-						axios.post("http://ec2-52-6-145-35.compute-1.amazonaws.com:5001/api/data/ProductData", product);
-						console.log("sending data to shopify:", response.data);
-						console.log("shop after");
-						handlePublishToast();
+						axios.post(`${import.meta.env.VITE_APP_API_URL}/data/ProductData`, updatedLayerData);
+						console.log("Sending data to Shopify:", response.data);
+						setShowModal1(false);
+						toast.success("The product was successfully published!");
+						navigate('/product-pricing-details')
 					})
 					.catch((error) => {
-						console.error("Error sending data to shopify:", error);
+						console.error("Error sending data to Shopify:", error);
+						setShowModal1(false);
 					});
 			})
 			.catch((error) => {
-				console.error("Error sending data layer data", error);
+				console.error("Error sending data to layer data:", error);
+				setShowModal1(false);
+				toast.error("There is a issue to publish product!");
 			});
-	}
+	};
+	const imgToCloudinary = async (image) => {
+		try {
+			const response = await fetch(image);
+			const blob = await response.blob();
+			const file = new File([blob], "image.jpg", { type: 'image/jpeg' });
+			const formData = new FormData();
+			formData.append("file", file);
+			formData.append("upload_preset", "Images");
+			formData.append("cloud_name", "dmew5rudk");
+			// Upload file to Cloudinary
+			const res = await axios.post(
+				"https://api.cloudinary.com/v1_1/dmew5rudk/image/upload",
+				formData
+			);
+			return res.data.secure_url;
+		} catch (error) {
+			console.error("Error uploading image to Cloudinary:", error);
+			throw error;
+		}
+	};
 	const handleClose = () => {
 		setShowModal(false)
+		setShowResetModal(false)
 		navigate("/my-products");
 
 	};
-	const handleClosebtn = () => setShowModal(false);
+	const handleClosebtn = () => {setShowModal(false); setShowResetModal(false)}
+	const handleClosebtn1 = () => setShowModal1(false);
 	const handleShow = () => setShowModal(true);
-	const handleSaveDraft = () => {
+	const handleResetShow = () => setShowResetModal(true);
+
+	const handleSaveDraft = async () => {
+		if (!product_name.trim()) {
+
+			alert("Please fill in the product name.");
+			return;
+		}
 		const updatedProduct = {
-			...product,
+			title: product_name,
+			layerdata: Layer.map(layer => ({ ...layer })),
 			status: "inactive"
 		};
-
-
-		axios.post("http://ec2-52-6-145-35.compute-1.amazonaws.com:5001/api/data/ProductData", updatedProduct)
+setShowModal1(true);
+		for (const layer of updatedLayerData.layerdata) {
+			// Check if display type is image
+			if (layer.dispalyType === "Image") {
+				console.log("Image Thumbnail:", layer.Thumbailimage);
+				console.log("Images:", layer.images);
+				// Upload thumbnail image to Cloudinary and update URL
+				try {
+					const thumbnailUrl = await imgToCloudinary(layer.Thumbailimage);
+					layer.Thumbailimage = thumbnailUrl; // Update thumbnail URL in copied layer object
+					console.log("Thumbnail uploaded to Cloudinary:", thumbnailUrl);
+				} catch (error) {
+					// Handle error
+					console.error("Error uploading thumbnail to Cloudinary:", error);
+				}
+				// Upload each image in layer.images to Cloudinary and update the array
+				layer.images = await Promise.all(layer.images.map(async (image) => {
+					try {
+						const imageUrl = await imgToCloudinary(image.url);
+						return { ...image, url: imageUrl }; // Create a new object with updated URL
+					} catch (error) {
+						// Handle error
+						console.error("Error uploading image to Cloudinary:", error);
+						return image; // Return the original image object if an error occurs
+					}
+				}));
+				console.log("Images uploaded to Cloudinary:", layer.images);
+			}
+		}
+		axios.post(`${import.meta.env.VITE_APP_API_URL}/data/ProductData`, updatedProduct)
 			.then((response) => {
 				console.log("Draft saved successfully:", response.data);
 				navigate("/my-products");
+				setShowModal1(false);
 
 			})
 			.catch((error) => {
 				console.error("Error sending data to shopify:", error);
+				setShowModal1(false);
 			});
 
 
-
 	};
-
 	return (
-
 		<header className="Haze_header">
 			<div className="logo_section">
 				<div className="logo">
 					<a href="/dashboard">
-						<img src={svg1} alt="Logo" />
+						<img src="../../assets/Image/logo/Haze Logo 1 (1).png" alt="Logo" />
 					</a>
 				</div>
 			</div>
-
 			<div className="menu">
 				<ul className="header_menu">
 					<li className="header_menu_list">
@@ -279,15 +345,15 @@ const Header = () => {
 					</li>
 				</ul>
 			</div>
-
 			<div className="right_header_Section">
 				<button className="login_buttotn">Logic</button>
+				<hr className='hr_product' />
 				<button className="view_button " onClick={handlePriview}>
 					<FaRegEye />
 				</button>
 				<button className="dropdown">
 					<span className="popup-button" onClick={PublishProduct}>
-						Publish
+						Next
 					</span>
 					{isPopupOpen && (
 						<div id="popupContent" className="popup">
@@ -315,8 +381,10 @@ const Header = () => {
 								stroke-linecap="round" /></svg>
 						</span>
 						{isDropdownOpen && (
-							<div id="dropdownContent" className="dropdown-content">
-								<p onClick={handleShow} >Discard</p>
+							<div id="dropdownContent" className="dropdown-content p-0">
+								<p onClick={handleShow} className='p-2 mb-0'>Discard</p>
+								<p onClick={handleResetShow} className='mb-0 p-2 border-0'>Reset</p>
+
 							</div>
 						)}
 					</span>
@@ -339,9 +407,34 @@ const Header = () => {
 					</Button>
 				</Modal.Footer>
 			</Modal>
-		</header>
+			<Modal show={showResetModal} onHide={handleClosebtn} centered>
+				<Modal.Header closeButton>
+					<Modal.Title>Confirm Action</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<p>Do you want to save your changes as a draft, or discard them?</p>
+				</Modal.Body>
+				<Modal.Footer>
+					<Button variant="secondary" onClick={handleSaveDraft}>
+						Save As Draft
+					</Button>
+					<Button variant="danger" onClick={handleClose}>
+						Reset
+					</Button>
+				</Modal.Footer>
+			</Modal>
+			<Modal className='bg-white' show={showModal1} centered>
+			
+				<div className="progress">
+    <div className="progress_item"></div>
+</div>
 
+				
+				
+				
+
+			</Modal>
+		</header>
 	);
 };
-
 export default Header;

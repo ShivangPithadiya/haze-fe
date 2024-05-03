@@ -3,7 +3,7 @@ import "../products/myproduct.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { resetState } from "../../features/customizeProductSlice";
+import { customizeProduct,setLayerData, resetState } from "../../features/customizeProductSlice";
 import { LuArrowUpDown } from "react-icons/lu";
 import {
   HiOutlineArrowNarrowDown,
@@ -25,7 +25,10 @@ const MyProduct = (props) => {
   const [sortOrder, setSortOrder] = useState(""); // Track sorting order "Newest to oldest", "Oldest to Newest", "A to Z", or "Z to A"
   const [sortedActiveProducts, setSortedActiveProducts] = useState([]); // State to hold sorted and searched active products
   const dropdownRef = useRef(null); // Ref for the dropdown
+  const [showPopup, setShowPopup] = useState(false);
+  const [openModallayer, setOpenModallayer] = useState(false);
 
+ const ProductCustomizer = useSelector((state) => state?.customizeProduct);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -102,7 +105,7 @@ const MyProduct = (props) => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(
-          "http://ec2-52-6-145-35.compute-1.amazonaws.com:5001/api/data/ProductData"
+          `${import.meta.env.VITE_APP_API_URL}/data/ProductData`
         );
         setProducts(response.data);
       } catch (error) {
@@ -112,6 +115,55 @@ const MyProduct = (props) => {
 
     fetchProducts();
   }, []);
+
+const handelproductclick = (data) => {
+  dispatch(resetState());
+  // Iterate over each item in the layerdata array
+  data.layerdata.forEach((layer) => {
+    // Dispatch each layer to your Redux store
+    dispatch(setLayerData(layer));
+  });
+  // and send to /product-customizer?productType=Minimal page 
+  const title= 'Minimal';
+  navigate(`/product-customizer?productType=${title}`);
+};
+
+  const duplicateProduct = async (productId) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_APP_API_URL}/data/ProductData/${productId}/duplicate`
+      );
+      // Handle success response, if needed
+      console.log("Product duplicated:", response.data);
+      // Refresh the product list or perform any other necessary actions
+      // For example, refetch products from the server
+  
+    } catch (error) {
+      console.error("Error duplicating product:", error);
+    }
+  };
+
+  // Handle duplicate product click
+  const handleDuplicateProduct = (productId) => {
+    duplicateProduct(productId);
+  };
+const handleArchive = async (productId) => {
+  try {
+    const response = await axios.patch(
+      `${import.meta.env.VITE_APP_API_URL}/data/ProductData/${productId}`,
+      { status: "inactive" }
+    );
+    // Handle success response, if needed
+    console.log("Product archived:", response.data);
+    // Update local state to reflect the change
+    setProducts(products.map(product => 
+      product._id === productId ? { ...product, status: "inactive" } : product
+    ));
+  } catch (error) {
+    console.error("Error archiving product:", error);
+  }
+};
+
 
   useEffect(() => {
     setActiveProducts(
@@ -130,6 +182,9 @@ const MyProduct = (props) => {
     navigate(`/product-customizer?productType=${productType}`);
     dispatch(resetState());
   };
+  const handlePopup = () => {
+    setShowPopup(true)
+  }
 
   return (
     <div className="left_wrapper">
@@ -295,17 +350,76 @@ const MyProduct = (props) => {
                   <div className="my-product-container">
                     {sortedActiveProducts.map((data, index) => (
                       <div key={index} className="my-products-card">
-                        <div className="my-products-img">
+                        <div className="my-products-img" onClick={()=>handelproductclick(data)}>
                           <img
-                            src={"./assets/img/product-0001.png"}
+                            src={data.layerdata[0]?.Thumbailimage}
                             alt={`Product ${index + 1}`}
                           />
                         </div>
-                        <div className="my-products-details">
-                          <h3 className="my-products-title">{data.title}</h3>
-                          <p className="my-products-text">
-                            Last Updated: {data.published_at}
-                          </p>
+                        <div className="my-products-details d-flex justify-content-between">
+                          <div>
+                            <h3 className="my-products-title">{data.title}</h3>
+                            <p className="my-products-text">
+                              Last Updated: {new Date(data.updated_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="dots">
+                            <span onClick={() => handlePopup()} className=""
+                              type="button"
+                              data-bs-toggle="dropdown"
+                              aria-expanded="false">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                                <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                              </svg>
+                            </span>
+                            <ul className="dropdown-menu">
+                              <li  onClick={()=>handelproductclick(data)}>
+                                <p className="dropdown-item" >
+                                 Preview
+                                </p>
+                              </li>
+                              <li onClick={()=>handleDuplicateProduct(data._id)}>
+                                <p className="dropdown-item" >
+                                  Duplicate
+                                </p>
+                              </li>
+                               <li onClick={()=>handleArchive(data._id)}>
+                                <p className="dropdown-item" >
+                                 Archive
+                                </p>
+                              </li>
+                            </ul>
+                            {/* {showPopup && (
+                              <div className="modal_div">
+                                <div
+                                  className="modal-div"
+                                >
+                                  <div className="modal-content px-3">
+                                    <form id="imageForm" className="form_image">
+                                      <div className="">
+                                        <div className="creat_modal_section_row creat_div flex justify-end">
+                                          <ul>
+                                            <li className="mb-2">
+                                              <span>
+                                                {" "}
+                                                Preview
+                                              </span>
+                                            </li>
+                                            <li>
+                                              <span>
+                                                {" "}
+                                                Duplicate
+                                              </span>
+                                            </li>
+                                          </ul>
+                                        </div>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+                            )} */}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -379,14 +493,14 @@ const MyProduct = (props) => {
                       <div key={index} className="my-products-card">
                         <div className="my-products-img">
                           <img
-                            src={"./assets/img/product-0001.png"}
+                            src={data.layerdata[0].Thumbailimage}
                             alt={`Product ${index + 1}`}
                           />
                         </div>
                         <div className="my-products-details">
                           <h3 className="my-products-title">{data.title}</h3>
                           <p className="my-products-text">
-                            Last Updated: {data.published_at}
+                            Last Updated: {new Date(data.updated_at).toLocaleDateString()}
                           </p>
                         </div>
                       </div>

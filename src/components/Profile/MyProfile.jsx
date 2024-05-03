@@ -1,22 +1,55 @@
 import React, { useEffect, useState, useRef } from "react";
 import "../Profile/Profile.css";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../../features/userSlice";
+import { useSelector } from "react-redux";
 import _ from "lodash";
+import { Link, useNavigate } from "react-router-dom";
 
 const MyProfile = () => {
   const [userData, setUserData] = useState(null);
+  const dispatch = useDispatch();
+   const navigate = useNavigate();
   const frmRef = useRef("MyProfile");
+
   const fileInputRef = useRef(null);
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
 
   const handleIconClick = () => {
     fileInputRef.current.click();
   };
-  const handleFileChange = (e) => {
+   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
+      
+      imgToCloudinary(file)
+        .then((url) => {
+          setSelectedImage(url);
+        })
+        .catch((error) => {
+          console.error("Error uploading image to Cloudinary:", error);
+        });
+    }
+  };
+
+
+    const imgToCloudinary = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "Images");
+      formData.append("cloud_name", "dmew5rudk");
+      const response = await axios.post(
+        "https://api.cloudinary.com/v1_1/dmew5rudk/image/upload",
+        formData
+      );
+      return response.data.secure_url;
+    } catch (error) {
+      console.error("Error uploading image to Cloudinary:", error);
+      throw error;
     }
   };
 
@@ -28,28 +61,42 @@ const MyProfile = () => {
       return false;
     }
     let frmdata = new FormData(frm);
+
     let formDataObject = {};
+    const previousUserData = JSON.parse(localStorage.getItem("user"));
     for (let [key, value] of frmdata.entries()) {
-      if (formDataObject[key]) {
-        if (Array.isArray(formDataObject[key])) {
-          formDataObject[key].push(value);
-        } else {
-          formDataObject[key] = [formDataObject[key], value];
-        }
+      console.log(key, value);
+
+
+      if (key === "profileImage") {
+        formDataObject[key] = selectedImage;
+        console.log(formDataObject[key]);
+
       } else {
         formDataObject[key] = value;
+        console.log(formDataObject[key]);
+
+
       }
+
+
     }
+     const updatedUserData = { ...previousUserData, ...formDataObject };
+
+  // Update localStorage
+  localStorage.setItem("user", JSON.stringify(updatedUserData));
+ 
     console.log(formDataObject);
     try {
-      const url = `http://ec2-52-6-145-35.compute-1.amazonaws.com:5001/api/profile/addprofiledetails`;
+      const url = `${import.meta.env.VITE_APP_API_URL}/profile/addprofiledetails`;
       const response = axios.post(url, formDataObject);
       if (response.status === 304) {
-        return;
+       return;
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
+    navigate("/dashboard");
   };
 
   useEffect(() => {
@@ -57,7 +104,7 @@ const MyProfile = () => {
     const fetchId = userGetData._id;
     const fetchData = async () => {
       try {
-        const url = `http://ec2-52-6-145-35.compute-1.amazonaws.com:5001/api/profile/getuser/${fetchId}`;
+        const url = `${import.meta.env.VITE_APP_API_URL}/profile/getuser/${fetchId}`;
         const response = await axios.get(url);
         if (response.status === 304) {
           return;
@@ -71,6 +118,13 @@ const MyProfile = () => {
   }, []);
 
   console.log(userData);
+  const defaultImage = "./public/assets/img/Avatar1.png";
+
+
+const primagge =_.get(userData, "profileImage", "")
+
+
+
   return (
     <div className="left_wrapper">
       <div className="wrapper_header">
@@ -105,17 +159,18 @@ const MyProfile = () => {
                                 className="mainuploadimg "
                               />
                             ) : (
+                              
                               <img
-                                src={"./assets/img/Avatar1.png"}
-                                alt="Default"
+                                src={primagge ? primagge : defaultImage}
+                                alt="Selected"
                                 className="mainuploadimg "
                               />
                             )}
 
                             <input
                               type="file"
-                              name="profileImage"
                               ref={fileInputRef}
+                              name="profileImage"
                               style={{ display: "none" }}
                               onChange={handleFileChange}
                             />
@@ -270,3 +325,11 @@ const MyProfile = () => {
 };
 
 export default MyProfile;
+
+
+
+
+
+
+
+

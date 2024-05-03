@@ -14,7 +14,7 @@ const ThemeProvider = (props) => {
     setCustomizerData(newValue);
   };
   const handleColorChange = (newColor, elementId) => {
-    setShowPicker(!showPicker);
+    setShowPicker(true);
     if (newColor && newColor.hex && elementId) {
       if (
         elementId === "CustomizerTitleBackgroundColor" ||
@@ -136,7 +136,76 @@ const ThemeProvider = (props) => {
               : ""]: newColor.hex,
           },
         }));
-      }      
+      } 
+      if(elementId === "TextInputAndDropdownBackgroundColor" ||
+      elementId === "TextInputAndDropdownBorderColor" ||
+      elementId === "TextInputAndDropdownFontColor" ||
+      elementId === "TextInputAndDropdownMenuBackgroundColor" ||
+      elementId === "TextInputAndDropdownHovOpClr" ||
+      elementId === "TextInputAndDropdownHoverBackgroundColor" ||
+      elementId === "TextInputAndDropdownSelcOpClr" ||
+      elementId === "TextInputAndDropdownMenuFontColor" ||
+      elementId === "TextInputAndDropdownHoverBorderColor" ||
+      elementId === "TextInputAndDropdownHoverFontColor" ){
+        setCustomizerData((prevData) => ({
+          ...prevData,
+          TextInputAndDropdown: {
+            ...prevData.TextInputAndDropdown,
+            [elementId === "TextInputAndDropdownBackgroundColor"
+              ? "TextInputAndDropdownBackgroundColor"
+              : elementId === "TextInputAndDropdownBorderColor"
+              ? "TextInputAndDropdownBorderColor"
+              : elementId === "TextInputAndDropdownFontColor"
+              ? "TextInputAndDropdownFontColor"
+              : elementId === "TextInputAndDropdownMenuFontColor"
+              ? "TextInputAndDropdownMenuFontColor"
+              : elementId === "TextInputAndDropdownMenuBackgroundColor"
+              ? "TextInputAndDropdownMenuBackgroundColor"
+              : elementId === "TextInputAndDropdownHoverBackgroundColor"
+              ? "TextInputAndDropdownHoverBackgroundColor"
+              : elementId === "TextInputAndDropdownHoverBorderColor"
+              ? "TextInputAndDropdownHoverBorderColor"
+              : elementId === "TextInputAndDropdownHovOpClr"
+              ?"TextInputAndDropdownHovOpClr"
+              : elementId === "TextInputAndDropdownSelcOpClr"
+              ? "TextInputAndDropdownSelcOpClr"
+              : elementId === "TextInputAndDropdownHoverFontColor"
+              ? "TextInputAndDropdownHoverFontColor"
+              : ""]: newColor.hex,
+          },
+        }));
+      }
+       //FileUploadBackgroundColor, FileUploadBorderColor,FileUploadFontColor,FileUploadLinkColor,FileUploadRemoveoptionbgColor ,FileUploadRemoveophoverbgColor,FileUploadRemoveIconColor
+if(elementId === "FileUploadBackgroundColor" ||
+elementId === "FileUploadBorderColor" ||
+elementId === "FileUploadFontColor" ||
+elementId === "FileUploadLinkColor" ||
+elementId === "FileUploadRemoveoptionbgColor" ||
+elementId === "FileUploadRemoveophoverbgColor" ||
+elementId === "FileUploadRemoveIconColor" ){
+  setCustomizerData((prevData) => ({
+    ...prevData,
+    FileUpload: {
+      ...prevData.FileUpload,
+      [elementId === "FileUploadBackgroundColor"
+
+        ? "FileUploadBackgroundColor"
+        : elementId === "FileUploadBorderColor"
+        ? "FileUploadBorderColor"
+        : elementId === "FileUploadFontColor"
+        ? "FileUploadFontColor"
+        : elementId === "FileUploadLinkColor"
+        ? "FileUploadLinkColor"
+        : elementId === "FileUploadRemoveoptionbgColor"
+        ? "FileUploadRemoveoptionbgColor"
+        : elementId === "FileUploadRemoveophoverbgColor"
+        ? "FileUploadRemoveophoverbgColor"
+        : elementId === "FileUploadRemoveIconColor"
+        ? "FileUploadRemoveIconColor"
+        : ""]: newColor.hex,
+    },
+  }));
+}
       if(elementId === "ConfirmButtonMobileFontColor" ||
       elementId === "ConfirmButtonMobileBackgroundColor" ){
         setCustomizerData((prevData) => ({
@@ -214,6 +283,36 @@ const ThemeProvider = (props) => {
             ...prevData.ShareButton,
             [elementId === "ShareButtonColor"
               ? "ShareButtonColor"
+              : ""]: newColor.hex,
+          },
+        }));
+      }
+      /*PrintReadyEditionColor,PrintReadyEditionIconColor,PrintReadyEditionDPIIndicatorTextColor,DPILowQualityTextColor,LowQualityMessageBackgroundColor,LowQualityMessageTextColor,DPIHighQualityColor*/
+      if(elementId === "PrintReadyEditionColor" ||
+      elementId === "PrintReadyEditionIconColor" ||
+      elementId === "PrintReadyEditionDPIIndicatorTextColor" ||
+      elementId === "DPILowQualityTextColor" ||
+      elementId === "LowQualityMessageBackgroundColor" ||
+      elementId === "LowQualityMessageTextColor" ||
+      elementId === "DPIHighQualityColor"){
+        setCustomizerData((prevData) => ({
+          ...prevData,
+          PrintReady: {
+            ...prevData.PrintReady,
+            [elementId === "PrintReadyEditionColor"
+              ? "PrintReadyEditionColor"
+              : elementId === "PrintReadyEditionIconColor"
+              ? "PrintReadyEditionIconColor"
+              : elementId === "PrintReadyEditionDPIIndicatorTextColor"
+              ? "PrintReadyEditionDPIIndicatorTextColor"
+              : elementId === "DPILowQualityTextColor"
+              ? "DPILowQualityTextColor"
+              : elementId === "LowQualityMessageBackgroundColor"
+              ? "LowQualityMessageBackgroundColor"
+              : elementId === "LowQualityMessageTextColor"
+              ? "LowQualityMessageTextColor"
+              : elementId === "DPIHighQualityColor"
+              ? "DPIHighQualityColor"
               : ""]: newColor.hex,
           },
         }));
@@ -321,6 +420,21 @@ const ThemeProvider = (props) => {
         },
       }));
     }
+  
+      if(name === "TextInputAndDropdownHeight" ||
+      name === "TextInputAndDropdownRounding" ||
+      name === "TextInputAndDropdownFontFamily" ||
+      name === "TextInputAndDropdownFontSize" )
+      {
+        setCustomizerData((prevData) => ({
+          ...prevData,
+          TextInputAndDropdown: {
+            ...prevData.TextInputAndDropdown,
+            [name]: value,
+          },
+        }));
+      }
+
     if(name === "PricePosition" ||
     name === "PriceFontFamily" ||
     name === "PriceFontSize" ||
@@ -330,6 +444,32 @@ const ThemeProvider = (props) => {
         ...prevData,
         Price: {
           ...prevData.Price,
+          [name]: value,
+        },
+      }));
+    }
+    // FileUploadBorderRounding,FileUploadFontFamily,FileUploadFontSize,FileUploadImgRoundings,FileUploadBorderRounding
+    if(
+      name ==="FileUploadBorderRounding" ||
+      name ==="FileUploadFontFamily" ||
+      name ==="FileUploadFontSize" ||
+      name ==="FileUploadImgRoundings" ||
+      name ==="FileUploadBorderRounding"
+    ){
+      setCustomizerData((prevData) => ({
+        ...prevData,
+        FileUpload: {
+          ...prevData.FileUpload,
+          [name]: value,
+        },
+      }));
+    }
+    
+    if(name === "ConfirmButtonMobileFontSize"){
+      setCustomizerData((prevData) => ({
+        ...prevData,
+        ConfirmButtonMobile: {
+          ...prevData.ConfirmButtonMobile,
           [name]: value,
         },
       }));
@@ -407,6 +547,21 @@ const ThemeProvider = (props) => {
     localStorage.setItem("customizerData", JSON.stringify(newData));
   }, [customizerData.CustomizerTitle]);
 
+  useEffect(()=>
+  {
+    const newData = customizerData
+    ? {
+        ...customizerData,
+      PrintReady: {
+          ...customizerData.PrintReady,
+          ...customizerData.PrintReady,
+        },
+      }
+    : customizerData;
+    localStorage.setItem("customizerData", JSON.stringify(newData));
+
+  },[customizerData.PrintReady]);
+  
   useEffect(() => {
     const newData = customizerData
       ? {
@@ -484,6 +639,18 @@ const ThemeProvider = (props) => {
     const newData = customizerData
       ? {
           ...customizerData,
+          FileUpload: {
+            ...customizerData.FileUpload,
+            ...customizerData.FileUpload, // Added optional chaining here
+          },
+        }
+      : customizerData;
+      localStorage.setItem("customizerData", JSON.stringify(newData));
+  }, [customizerData.FileUpload]);
+  useEffect(() => {
+    const newData = customizerData
+      ? {
+          ...customizerData,
           AddToCart: {
             ...customizerData.AddToCart,
             ...customizerData.AddToCart, // Added optional chaining here
@@ -492,6 +659,18 @@ const ThemeProvider = (props) => {
       : customizerData;
     localStorage.setItem("customizerData", JSON.stringify(newData));
   }, [customizerData.AddToCart]);
+  useEffect(() => {
+    const newData = customizerData
+      ? {
+          ...customizerData,
+          TextInputAndDropdown: {
+            ...customizerData.TextInputAndDropdown,
+            ...customizerData.TextInputAndDropdown, // Added optional chaining here
+          },
+        }
+      : customizerData;
+    localStorage.setItem("customizerData", JSON.stringify(newData));
+  }, [customizerData.TextInputAndDropdown]);
   useEffect(() => {
     const newData = customizerData
       ? {
