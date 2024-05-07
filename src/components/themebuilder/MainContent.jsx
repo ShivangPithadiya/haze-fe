@@ -29,7 +29,8 @@ var settings = {
 
 const MainContent = () => {
   const [isMobile, setIsMobile] = useState(false);
-  const { customizerData } = useContext(ThemeContext);
+  const { customizerData,
+   handleProductChange } = useContext(ThemeContext);
   const [customizerLayerPanel, setCustomizerLayerPanel] = useState({});
   const [customizerLayerList, setCustomizerLayerList] = useState({});
   const [customizerPrice, setCustomizerPrice] = useState({});
@@ -40,10 +41,14 @@ const MainContent = () => {
   const [accordionTwoOpen, setAccordionTwoOpen] = useState(false);
   const [accordionThreeOpen, setAccordionThreeOpen] = useState(false);
   const [SeletedLayer, setSeletedLayer] = useState([]);
-  
+  const [openAccordions, setOpenAccordions] = useState([]);
 
   const viewport = useSelector(state => state.customizeProduct.viewport);
-
+ const toggleAccordion = (index) => {
+    setOpenAccordions((prev) =>
+      prev.includes(index) ? prev.filter((item) => item !== index) : [...prev, index]
+    );
+  };
   const toggleAccordionOne = () => {
     setAccordionOneOpen((prev) => !prev);
     setAccordionTwoOpen(false);
@@ -147,8 +152,9 @@ useEffect(() => {
     if (!id || id === prevProductId) return; // Exit if there's no change in product ID
 
     try {
-      const res = await axios.get(`${import.meta.env.VITE_APP_API_URL}/data/layerdata/${id}`);
+      const res = await axios.get(`${import.meta.env.VITE_APP_API_URL}/data/ProductData/${id}`);
       setLayerData(res.data);
+       handleProductChange(res.data);
       setPrevProductId(id); // Update prevProductId after successful fetch
     } catch (error) {
       console.error('Error fetching layer data:', error);
@@ -167,6 +173,7 @@ console.log('Layer Data:', layerData);
 
 
 
+
   return (
     <>
       <div className="center_wrapper">
@@ -179,45 +186,45 @@ console.log('Layer Data:', layerData);
                    <CustomizerTitle layerData={layerData} />
                    
 
- {layerData?.layerdata.map((layer, index)  => (
-  <>
-    {layer?.dispalyType === "Image" && (
-      <>
-        <div className="products_wrapper_row">
-          <div className="products_wrapper_col">
-            <div className="products-active products_wrapper_image" onClick={()=>handelimageclick(index)}>
-              <img src={layer?.Thumbailimage} alt="image" width={40} />
-            </div>
-          </div>
-        </div>
-      </>
-    )}
-   {layer?.dispalyType === "Colour" && (
-      <>
-        <div className="products_wrapper_tag" style={customizerLayerList}>
-       {layer.imageTitle}
-        </div>
-        <div className="products_wrapper_row">
-          <div className="products_wrapper_col">
-            <div className="products_colour_section">
-              {layer.colours.map((color, index) => (
-                <span
-                  key={index}
-                  className="products-active"
-                  style={{ backgroundColor: color.color }}
-                  onClick={() => handleColourclik(color)}
-                ></span>
-              ))}
-            </div>
-          </div>
-         
-        </div>
-      </>
-    )}
-  </>
+                    {layerData?.layerdata.map((layer, index)  => (
+                    <>
+                      {layer?.dispalyType === "Image" && (
+                        <>
+                          <div className="products_wrapper_row">
+                            <div className="products_wrapper_col">
+                              <div className="products-active products_wrapper_image" onClick={()=>handelimageclick(index)}>
+                                <img src={layer?.Thumbailimage} alt="image" width={40} />
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    {layer?.dispalyType === "Colour" && (
+                        <>
+                          <div className="products_wrapper_tag" style={customizerLayerList}>
+                        {layer.imageTitle}
+                          </div>
+                          <div className="products_wrapper_row">
+                            <div className="products_wrapper_col">
+                              <div className="products_colour_section">
+                                {layer.colours.map((color, index) => (
+                                  <span
+                                    key={index}
+                                    className="products-active"
+                                    style={{ backgroundColor: color.color }}
+                                    onClick={() => handleColourclik(color)}
+                                  ></span>
+                                ))}
+                              </div>
+                            </div>
+                          
+                          </div>
+                        </>
+                      )}
+                    </>
 
-  
-))}
+                    
+                  ))}
 
                  
                    
@@ -357,68 +364,61 @@ console.log('Layer Data:', layerData);
             {customizerLayerPanel?.PanelPosition === "left" && (
               <>
                 <div className="products_col prod_col" style={customizerLayerPanel}>
-                  <CustomizerTitle />
+                  <CustomizerTitle layerData={layerData} />
                   <div className="products_wrapper_tag__main">
                     <div className="products__cont__three">
-                      <div className="br__bttotom">
-                        <div
-                          onClick={toggleAccordionOne}
-                          className={`accordion-title ${accordionOneOpen ? "open" : ""
-                            }`}
-                        >
-                          <h2 className="products_wrapper_tag ">Mug Colour</h2>
-                        </div>
-                        <div
-                          className={`accordion-content ${accordionOneOpen ? "open" : ""
-                            }`}
-                        >
-                          <div className="colors__box">
-                            <div className="products_colour_section">
-                              <span className="products-active"></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
+        {layerData?.layerdata.map((layer, index) => (
+        <>
+        <div key={index}>
+          {layer?.dispalyType === "Image" && (
+            <div className="br__bttotom" key={index}>
+              <div
+                onClick={() => toggleAccordion(index)}
+                className={`accordion-title ${openAccordions.includes(index) ? "open" : ""}`}
+              >
+                <h2 className="products_wrapper_tag "> {layer.imageTitle}</h2>
+              </div>
+              <div
+                className={`accordion-content ${openAccordions.includes(index) ? "open" : ""}`}
+              >
+                <div className="products-active products_wrapper_image" onClick={()=>handelimageclick(index)}>
+              <img src={layer?.Thumbailimage} alt="image" width={40} />
+            </div>
+              </div>
+            </div>
+          )}
+        </div>
+   
+        <div key={index}>
+          {layer?.dispalyType === "Colour" && (
+            <div className="br__bttotom" key={index}>
+              <div
+                onClick={() => toggleAccordion(index)}
+                className={`accordion-title ${openAccordions.includes(index) ? "open" : ""}`}
+              >
+                <h2 className="products_wrapper_tag "> {layer.imageTitle}</h2>
+              </div>
+              <div
+                className={`accordion-content ${openAccordions.includes(index) ? "open" : ""}`}
+              >
+                <div className="colors__box">
+                   <div className="products_colour_section">
+                              {layer.colours.map((color, index) => (
+                <span
+                  key={index}
+                  className="products-active"
+                  style={{ backgroundColor: color.color }}
+                  onClick={() => handleColourclik(color)}
+                ></span>
+              ))}
                             </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="br__bttotom">
-                        <div
-                          onClick={toggleAccordionTwo}
-                          className={`accordion-title ${accordionTwoOpen ? "open" : ""
-                            }`}
-                        >
-                          <h2 className="products_wrapper_tag ">
-                            Handle Colour
-                          </h2>
-                        </div>
-                        <div
-                          className={`accordion-content ${accordionTwoOpen ? "open" : ""
-                            }`}
-                        >
-                          <div className="colors__box">
-                            <div className="products_colour_section">
-                              <span className="products-active"></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                              <span></span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        </>
+      ))}
 
                       <div className="br__bttotom">
                         <div
@@ -462,14 +462,19 @@ console.log('Layer Data:', layerData);
                     </div>
                   </div>
                   <div className="products_slid">
-                    <Slider {...settings}>
-                      <div>
-                        <img src="/assets/Image/product/mug.png" />
-                      </div>
-                      <div>
-                        <img src="/assets/Image/product/mug.png" />
-                      </div>
-                    </Slider>
+                   {
+                        SeletedLayer.map((layer, index) => (
+
+                          <Slider {...settings} key={index}>
+                            {layer.images.map((image, index) => (
+                              <div key={index}>
+                                <img src={image.url} alt="image" />
+                              </div>
+                            ))}
+
+                          </Slider>
+                        ))
+                      }
                   </div>
                   <AddToCart />
                 </div>

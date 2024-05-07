@@ -1,5 +1,6 @@
 import React, { useEffect, createContext, useState } from "react";
 import Utils from "../Utils";
+import { set } from "lodash";
 const ThemeContext = createContext();
 
 const ThemeProvider = (props) => {
@@ -7,11 +8,34 @@ const ThemeProvider = (props) => {
   const [showPicker, setShowPicker] = useState(false);
   const [showElement, setShowElement] = useState("");
   const [customizerData, setCustomizerData] = useState(() => {
-    const storedData = JSON.parse(localStorage.getItem("customizerData"));
+    const storedData = JSON.parse(localStorage.getItem("customizerData1"));
     return storedData || Utils.initialCustomizerData;
   });
+  const storedData = JSON.parse(localStorage.getItem("customizerData1"));
+  const selectedProductId = localStorage.getItem("selectedProductId");
+  useEffect(() => {
+    
+    if (storedData) {
+      setCustomizerData(storedData);
+    }
+    else{
+      setCustomizerData(Utils.initialCustomizerData);
+    }
+  }, [selectedProductId]);
+
+
   const updateCustomizerData = (newValue) => {
     setCustomizerData(newValue);
+  };
+  const handleProductChange = (newProduct) => {
+    setCustomizerData((prevData) => ({
+      ...prevData,
+      ProductDetails: {
+        ...prevData.ProductDetails,
+        productId: newProduct._id,
+        productName: newProduct.title,
+      },
+    }));
   };
   const handleColorChange = (newColor, elementId) => {
     setShowPicker(true);
@@ -561,6 +585,30 @@ elementId === "FileUploadRemoveIconColor" ){
     localStorage.setItem("customizerData", JSON.stringify(newData));
 
   },[customizerData.PrintReady]);
+
+  useEffect(() => {
+   
+    const newData = customizerData
+   
+      ? {
+          ...customizerData,
+          ProductDetails: {
+            ...customizerData.ProductDetails,
+            ...customizerData.ProductDetails,
+          },
+        }
+      : customizerData;
+  
+    localStorage.setItem("customizerData", JSON.stringify(newData));
+  }, [customizerData.ProductDetails]);
+
+
+
+
+
+
+    
+
   
   useEffect(() => {
     const newData = customizerData
@@ -792,6 +840,7 @@ elementId === "FileUploadRemoveIconColor" ){
         fontList,
         showPicker,
         showElement,
+         handleProductChange,
         handleColorChange,
         handleInputChange,
         handleColorPickerClick,

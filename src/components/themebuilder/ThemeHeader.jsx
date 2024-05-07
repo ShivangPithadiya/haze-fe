@@ -2,13 +2,14 @@ import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ThemeContext from "../../contexts/ThemeContext";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
+import axios from 'axios';
 import { setViewport } from "../../features/customizeProductSlice";
 import { useDispatch, useSelector } from "react-redux";
 import  "../themebuilder/RightSidebars/CustomizerTitleList.css";
 const ThemeHeader = ( ) => {
   const { customizerData, updateCustomizerData } = useContext(ThemeContext);
   const [selectProduct, setSelectProduct] = ("")
+  const[selected, setSelected] = useState("")
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -17,7 +18,7 @@ const ThemeHeader = ( ) => {
     const [layerData, setLayerData] = useState([]);
   useEffect(() => {
     const fetchlayerDatabyid = async () => {
-      const res = await axios.get(`${import.meta.env.VITE_APP_API_URL}/data/layerdata`);
+      const res = await axios.get(`${import.meta.env.VITE_APP_API_URL}/data//ProductData`);
       setLayerData(res.data);
     
   
@@ -115,28 +116,50 @@ console.log("layerData", layerData)
   // };
 
 const handleSelectChange = (event) => {
+  
+
   const selectedProductId = event.target.value;
+
   localStorage.setItem('selectedProductId', selectedProductId);
+  const authToken =localStorage.getItem('token');
+
+axios.get(`${import.meta.env.VITE_APP_API_URL}/data/customizer/${selectedProductId}`, {
+  headers: {
+    Authorization: `Bearer ${authToken}`,
+  },
+})
+.then((response) => {
+  console.log("data ", response.data);
+  // remove _id from the data
+  delete response.data._id;
+  delete response.data.pid;
+  delete response.data.__v
+  
+  localStorage.setItem('customizerData1', JSON.stringify(response.data));
+})
 };
   const handleDiscard = () => {
     navigate(`/my-products`)
   }
   const handleSaveThemeCustomizerData = () => {
-    
+     const newdata = JSON.parse(localStorage.getItem("customizerData"));
+  console.log("newdata", newdata);
   
-const authToken =localStorage.getItem('token');
+  // Retrieve other necessary data
+  const selectedProductId = localStorage.getItem('selectedProductId');
+  const authToken = localStorage.getItem('token');
 
-axios.post(`${import.meta.env.VITE_APP_API_URL}/data/customizer`, customizerData, {
-  headers: {
-    Authorization: `Bearer ${authToken}`
-  }
-})
-.then((response) => {
-  console.log("Sending data ", response.data);
-})
-.catch((error) => {
-  console.error("Error sending data :", error);
-});
+  axios.patch(`${import.meta.env.VITE_APP_API_URL}/data/customizer/${selectedProductId}`, newdata, {
+    headers: {
+      Authorization: `Bearer ${authToken}`
+    }
+  })
+  .then((response) => {
+    console.log("Sending data ", response.data);
+  })
+  .catch((error) => {
+    console.error("Error sending data :", error);
+  });
 
 
 

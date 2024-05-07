@@ -6,8 +6,8 @@ import { useSelector } from "react-redux";
 import { ToastContainer, toast } from 'react-toastify';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
+import InitialData from '../../components/themebuilder/InitialData';
 import axios from "axios"
 const Header = () => {
 	const productCustomizerData = useSelector((state) => state.customizeProduct);
@@ -21,6 +21,9 @@ const Header = () => {
 	const [showModal1, setShowModal1] = useState(false);
 	const navigate = useNavigate();
 	const [layerData, setLayerData] = useState();
+	const user = useSelector((state) => state.user.user);
+
+	
 
 	useEffect(() => {
 		setLayerData(Data);
@@ -153,6 +156,8 @@ const Header = () => {
 		toast.success("The draft was successfully published!");
 	}
 	const PublishProduct = async () => {
+		const shopifyStoredomain = user?.shopifystoredomain;
+		const shopifyaccesstoken = user?.shopifyaccesstoken;
 
 		if (!product_name.trim()) {
 
@@ -160,6 +165,7 @@ const Header = () => {
 			return;
 		}
 		const updatedLayerData = {
+			
 			title: product_name,
 			layerdata: Layer.map(layer => ({ ...layer })) // Create a shallow copy of each layer object
 		};
@@ -199,18 +205,33 @@ const Header = () => {
 		 updatedLayerData)
 			.then((response) => {
 				console.log("Data sent successfully to layerdata:", response.data);
-		const shopifyStoredomain = "hazetest.myshopify.com";
-        const shopifyaccesstoken = "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";
-				axios.post(`${import.meta.env.VITE_APP_API_URL}/shopify/products`,
+				const shopifyStoredomain = user?.shopifystoredomain;
+				const shopifyaccesstoken = user?.shopifyaccesstoken;
+				axios.post(`${import.meta.env.VITE_APP_API_URL}/shopify/products`, 
+				product,
 				{
-                    headers: {
-                       "shopifyStoredomain": `${shopifyStoredomain}`,
-                        "shopifyaccesstoken": `${shopifyaccesstoken}`,
-                    },
-                }
-				, product)
+					headers: {
+						"shopifyStoredomain": shopifyStoredomain,
+						"shopifyaccesstoken": shopifyaccesstoken
+					}
+				}
+			)
 					.then((response) => {
-						axios.post(`${import.meta.env.VITE_APP_API_URL}/data/ProductData`, updatedLayerData);
+						axios.post(`${import.meta.env.VITE_APP_API_URL}/data/ProductData`, updatedLayerData)
+						.then((response) => {
+
+							console.log("Data sent successfully to layerdata:", response.data);
+							InitialData.pid = response.data._id;
+						  InitialData.ProductDetails.productName = response.data.title;
+							InitialData.ProductDetails.productId = response.data._id;
+	
+							const authToken = localStorage.getItem('token');
+							axios.post(`${import.meta.env.VITE_APP_API_URL}/data/customizer`, InitialData, {
+							headers: {
+								Authorization: `Bearer ${authToken}`
+							}
+							})
+						})
 						console.log("Sending data to Shopify:", response.data);
 						setShowModal1(false);
 						toast.success("The product was successfully published!");
@@ -390,7 +411,7 @@ setShowModal1(true);
 					</span>
 				</button>
 			</div>
-			<ToastContainer position='top-center' />
+			{/* <ToastContainer position='top-center' /> */}
 			<Modal show={showModal} onHide={handleClosebtn} centered>
 				<Modal.Header closeButton>
 					<Modal.Title>Confirm Action</Modal.Title>

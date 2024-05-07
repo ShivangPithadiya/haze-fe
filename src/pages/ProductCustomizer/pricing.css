@@ -52,3 +52,9 @@
     padding: 20px;
     border-radius: 8px;
 }
+.add_theme_inner_container_select{
+    width: 186px !important;
+}
+.add_theme_inner_container_select option{
+    border: 1px solid red;
+}

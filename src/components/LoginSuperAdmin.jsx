@@ -7,9 +7,8 @@ import { setAccessToken } from "../features/authSlice";
 import { completeShopifyAuth } from "../shopifyAuth";
 import "./Login/Login.css";
 import UserContext from "../contexts/UserContext";
-import Cookies from 'js-cookie';
 
-const Login = ({ handleChange }) => {
+const LoginSuperAdmin = ({ handleChange }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordType, setPasswordType] = useState("password");
@@ -24,7 +23,7 @@ const Login = ({ handleChange }) => {
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_APP_API_URL}/auth/login`,
+        `${import.meta.env.VITE_APP_API_URL}/profile/superadmin/login`,
         {
           email,
           password,
@@ -32,7 +31,6 @@ const Login = ({ handleChange }) => {
       );
       if (response.data.success) {
         localStorage.setItem("user", JSON.stringify(response.data.user))
-        Cookies.set('user_data',JSON.stringify(response.data.user))
         localStorage.setItem("token", response.data.token)
         dispatch(loginUser(response.data.user));
         navigate("/dashboard"); // Redirect to dashboard
@@ -54,7 +52,7 @@ const Login = ({ handleChange }) => {
 
   return (
     <div className="login">
-      <div className="login_div">Login</div>
+      <div className="login_div">Login super-admin</div>
       <div>
         <label className="label_div">Email</label>
         <div className="input-div">
@@ -98,4 +96,4 @@ const Login = ({ handleChange }) => {
   );
 };
 
-export default Login;
+export default LoginSuperAdmin;

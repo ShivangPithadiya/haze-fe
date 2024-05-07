@@ -70,6 +70,8 @@ const ThemeSelector = () => {
   const navigate = useNavigate();
 
   const handleThemeSelect = (theme) => {
+    //delet localstorage selectedProductId
+    localStorage.removeItem("selectedProductId");
     navigate(`/theme-builder?selectedTheme=${theme}#Customizer_Title_list`);
   };
 

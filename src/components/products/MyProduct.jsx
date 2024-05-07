@@ -27,7 +27,8 @@ const MyProduct = (props) => {
   const dropdownRef = useRef(null); // Ref for the dropdown
   const [showPopup, setShowPopup] = useState(false);
   const [openModallayer, setOpenModallayer] = useState(false);
-
+  const [customizerData, setCustomizerData] = useState([]);
+const authToken =localStorage.getItem('token');
  const ProductCustomizer = useSelector((state) => state?.customizeProduct);
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -116,9 +117,34 @@ const MyProduct = (props) => {
     fetchProducts();
   }, []);
 
+
+
+// console.log("customizerData",customizerData.ProductDetails);
 const handelproductclick = (data) => {
+  console.log("data",data);
   dispatch(resetState());
-  // Iterate over each item in the layerdata array
+//send id from here /data/customizer/:productId and get the data from the database
+const pid = data._id;
+console.log("pid",pid);
+// http://localhost:8080/api/data/customizer/662a3a491227637b0363d8df
+axios.get(`${import.meta.env.VITE_APP_API_URL}/data/customizer/${pid}`, {
+  headers: {
+    Authorization: `Bearer ${authToken}`,
+  },
+})
+.then((response) => {
+  console.log("Sending data ", response.data);
+  setCustomizerData(response.data);
+  localStorage.setItem('SelectedCustomizerData', JSON.stringify(response.data));
+})
+.catch((error) => {
+  console.error("Error fetching data:", error);
+  localStorage.setItem('SelectedCustomizerData', JSON.stringify([]));
+});
+
+
+
+
   data.layerdata.forEach((layer) => {
     // Dispatch each layer to your Redux store
     dispatch(setLayerData(layer));
@@ -166,12 +192,16 @@ const handleArchive = async (productId) => {
 
 
   useEffect(() => {
-    setActiveProducts(
-      products.filter((product) => product.status === "active")
-    );
-    setInactiveProducts(
-      products.filter((product) => product.status !== "active")
-    );
+    if (products && products.length >0) {
+      console.log(",.nmdv",)
+      
+      setActiveProducts(
+        products?.filter((product) => product.status === "active")
+      );
+      setInactiveProducts(
+        products?.filter((product) => product.status !== "active")
+      );
+    }
   }, [products]);
 
   useEffect(() => {
@@ -180,6 +210,11 @@ const handleArchive = async (productId) => {
 
   const handleNavigate = (productType) => {
     navigate(`/product-customizer?productType=${productType}`);
+    // Remove the data from local storage
+    localStorage.setItem('SelectedCustomizerData', JSON.stringify([]));
+    // Show empty
+
+
     dispatch(resetState());
   };
   const handlePopup = () => {

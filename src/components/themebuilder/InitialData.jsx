@@ -1,20 +1,4 @@
-import _ from "lodash";
-import FileUpload from "./components/themebuilder/RightSidebars/FileUpload";
-
-const Utils = {
-  siteCookieName: `${import.meta.env.VITE_REACT_APP_APPNAME}-userData`,
-  apiUrl: (path) => {
-    // console.log("REACT_APP_API_URL:", process.env.REACT_APP_API_URL);
-    return import.meta.env.VITE_REACT_APP_API_URL + "/" + path;
-  },
-  getCookieOptions: () => {
-    let co = { secure: false, path: "/" };
-    if (process.env.REACT_APP_COOKIE_DOMAIN !== "localhost") {
-      co["domain"] = process.env.REACT_APP_COOKIE_DOMAIN;
-    }
-    return co;
-  },
-  initialCustomizerData: {
+export const InitialData  = {
     ProductDetails: {
       productId: "",
       productName: "",
@@ -178,7 +162,5 @@ const Utils = {
       OutOfStockBannerTextColor: "#ffff",
       OutOfStockBannerBackgroundColor: "#ffff",
     },
-  },
-};
-
-export default Utils;
+    };
+    export default InitialData;

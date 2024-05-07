@@ -1,6 +1,9 @@
 import Authenticate from "./Authenticate";
+import SuperAdminAuthenticate from "./SuperAdminAuthenticate";
 import Dashboard from "./Dashboard";
+import SuperAdminDashboard from "../components/dashboard/SuperAdminDashboard";
 import YourOrders from "./YourOrders";
+import LoginSuperAdmin from "../components/LoginSuperAdmin.jsx";
 import MyProducts from "./MyProducts";
 import Subscriptions from "./Subscriptions";
 import PricingRules from "./PricingRules";
@@ -14,16 +17,21 @@ import ThemeAddProduct from "./Theme1/ThemeAddProduct";
 import ThemeAddProduct2 from "./Theme1/TheneAddProduct2";
 import ThemeBuilder from "./ThemeBuilder";
 import YourProfile from "./YourProfile";
+import UserManagement from "./UserManagement";
 import Settings from "./Settings";
 import SimplePricing from "./PricingRules/SimplePricing";
 import AdvancedPricing from "./PricingRules/AdvancedPricing";
+import ProductDeatil from "./ProductDeatil";
 export default {
   ThemeAddProduct2,
   ThemeAddProduct,
   AddImage,
   PricingDetails,
   Authenticate,
+  SuperAdminAuthenticate,
   Dashboard,
+  LoginSuperAdmin,
+  SuperAdminDashboard,
   Settings,
   YourOrders,
   MyProducts,
@@ -37,4 +45,6 @@ export default {
   SavedDesigns,
   ThemeBuilder,
   YourProfile,
+  UserManagement,
+  ProductDeatil
 };

@@ -24,6 +24,7 @@
     "cloudinary": "^2.2.0",
     "colour": "^0.7.1",
     "firebase": "^10.5.2",
+    "js-cookie": "^3.0.5",
     "konva": "^9.3.2",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",

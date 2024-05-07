@@ -8,6 +8,7 @@ export default function PricingDetails() {
     console.log(Data);
     const [tab, setTab] = useState("extra-pricing");
     const [showModal, setShowModal] = useState(false);
+    const [showLayer, setShowLayer] = useState(false);
     const handleAddExtraPrice = () => {
         setShowModal(true);
         console.log('Add Extra Price');
@@ -19,9 +20,14 @@ export default function PricingDetails() {
 
     const handleSubmit = () => {
         // Handle form submission, add extra price
-      
+
         setShowModal(false);
     };
+
+
+    const handleLayer = () => {
+        setShowLayer(true)
+    }
     return (
         <div className='container-fluid pricing_container'>
             <div className="row d-flex p-5">
@@ -182,15 +188,52 @@ export default function PricingDetails() {
                             </div>
                         </div>
                     </div>
-{showModal && (
-    <div className="modal-over1">
-        <div className="modal-content1">
-            <div className="px-4 px-lg-0">
-                <div className="pb-5">
-                    <div className="container">
-                        <div className="row">
-                            <div className="col-12 w1x p-5 bg-white rounded shadow-sm mb-5">
-                                <div className="table-responsive">
+                    {showModal && (
+                        <div className="modal-over1">
+                            <div className="modal-content1">
+                                <div className="px-4 px-lg-0">
+                                    <div className="pb-5">
+                                        <div className="container">
+                                            <div className="row">
+                                                {/* w1x */}
+                                                <div className="col-12 p-4 bg-white rounded shadow-sm">
+                                                    <div className='mb-4'><h5>Create extra pricing</h5></div>
+                                                    <div className="select_pricing d-flex align-items-center">
+                                                        <span className="sidebar_menu_icon m-2">
+                                                            <img src="assets/Image/them/Layers.svg" />
+                                                        </span>
+                                                        <div className='m-2'>
+                                                            <select className="add_theme_inner_container_select w-100 p-2" onSelect={handleLayer}>
+                                                                <option value="Thumbnail">Select Layer</option>
+                                                                <option value="CAD">Handle Color</option>
+                                                                <option value="USD">Font Color</option>
+                                                                <option value="USD">Mug Color</option>
+                                                                <option value="USD">Mug Color</option>
+                                                            </select>
+
+                                                        </div>
+                                                        <div className='m-2'>
+                                                            <button className=" btn-close rounded-pill btn-block" onClick={handleCloseModal}></button>
+                                                        </div>
+                                                    </div>
+                                                    {showLayer && (
+                                                        <>
+                                                            <div className="font_select mb-4">
+                                                                <div class="">
+                                                                    <label htmlFor="">Neon Green</label>
+                                                                    <input class="file_select_title p-2 mb-2" placeholder='0' style={{ border: "1px solid #9C9C9C;" }} />
+                                                                    <br />
+                                                                    <label htmlFor="">Neon Yellow</label>
+                                                                    <input class="file_select_title p-2 mb-2" placeholder='0' style={{ border: "1px solid #9C9C9C;" }} />
+                                                                    <br />
+                                                                    <label htmlFor="">Neon Pink</label>
+                                                                    <input class="file_select_title p-2 mb-2" placeholder='0' style={{ border: "1px solid #9C9C9C;" }} />
+                                                                </div>
+                                                            </div>
+                                                        </>
+
+                                                    )}
+                                                    {/* <div className="table-responsive">
                                     <table className="table">
                                         <thead>
                                             <tr className='gap-2'>
@@ -253,20 +296,20 @@ export default function PricingDetails() {
                                             })}
                                         </tbody>
                                     </table>
-                                </div>
-                                <div className="modal-footer">
-                                    
-                                    <button className="btn btn-light rounded-pill py-2 btn-block" onClick={handleCloseModal}>Cancel</button>
-                                    <a href="#" className="btn btn-dark rounded-pill py-2 btn-block mx-2">Proceed</a>
+                                </div> */}
+                                                    {/* <div className="modal-footer">
+
+                                                        <button className="btn btn-light rounded-pill py-2 btn-block" onClick={handleCloseModal}>Cancel</button>
+                                                        <a href="#" className="btn btn-dark rounded-pill py-2 btn-block mx-2">Proceed</a>
+                                                    </div> */}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-)}
+                    )}
 
                 </div>
 

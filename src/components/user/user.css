@@ -1,0 +1,14 @@
+.user-content {
+    height: 70vh;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    text-align: center;
+    font-weight: 600;
+}
+.user-content span img{
+    width: 40px;
+    text-align: left;
+    margin-right: 148px;
+    margin-bottom: 5px;
+}

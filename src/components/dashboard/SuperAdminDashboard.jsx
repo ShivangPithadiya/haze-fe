@@ -3,42 +3,36 @@ import Chart from "./Chart";
 import BarChart from "./BarChart";
 import axios from "axios";
 import { useSelector } from "react-redux";
-
 const SuperAdminDashboard = (props) => {
     const user = useSelector(state => state.user.user)
     const [orders, setOrders] = React.useState([]);
-
     useEffect(() => {
         const fetchOrders = async () => {
-             const shopifyStoredomain = "hazetest.myshopify.com";
-        const shopifyaccesstoken = "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";
+            const shopifyStoredomain = user?.shopifystoredomain;
+            const shopifyaccesstoken = user?.shopifyaccesstoken;
             try {
                 const response = await axios.get(`${import.meta.env.VITE_APP_API_URL}/shopify/orders`,
-             {
+                {
                     headers: {
-                       "shopifyStoredomain": `${shopifyStoredomain}`,
-                        "shopifyaccesstoken": `${shopifyaccesstoken}`,
+                      shopifyStoredomain: `${shopifyStoredomain}`,
+                      shopifyaccesstoken: `${shopifyaccesstoken}`,
                     },
-                });
+                  }
+            );
                 setOrders(response.data.orders);
             } catch (error) {
                 console.error("Error fetching orders:", error);
             }
         };
-
         fetchOrders();
     }, []);
     console.log("Orders:", orders);
-
     let totalOrdersInRs = 0;
     let totalOrdersLength = 0;
     let averageOrderValue = 0;
     let growthRate = 0;
-
-
     if (Array.isArray(orders) && orders.length > 0) {
         totalOrdersInRs = orders.reduce((total, order) => {
-
             const amount = parseFloat(order.current_total_price || 0);
             return total + amount;
         }, 0);
@@ -48,7 +42,6 @@ const SuperAdminDashboard = (props) => {
         growthRate = ((totalOrdersLength - previousYearTotalOrders) / previousYearTotalOrders) * 100;
     }
     const [monthlySalesData, setMonthlySalesData] = useState([]);
-
     useEffect(() => {
         if (Array.isArray(orders) && orders.length > 0) {
             console.log("Orders:", orders);
@@ -96,5 +89,4 @@ const SuperAdminDashboard = (props) => {
         </div>
     );
 };
-
 export default SuperAdminDashboard;

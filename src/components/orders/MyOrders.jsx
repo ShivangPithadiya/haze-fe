@@ -11,13 +11,14 @@ const MyOrders = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+    const user = useSelector((state) => state.user.user);
       const dispatch = useDispatch();
   const navigate = useNavigate();
 
     useEffect(() => {
         const fetchOrders = async () => {
-             const shopifyStoredomain = "hazetest.myshopify.com";
-        const shopifyaccesstoken = "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";
+            const shopifyStoredomain = user?.shopifystoredomain;
+            const shopifyaccesstoken = user?.shopifyaccesstoken;
             try {
                 const response = await axios.get(`${import.meta.env.VITE_APP_API_URL}/shopify/orders`,
              {

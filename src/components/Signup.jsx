@@ -1,35 +1,37 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./Login/Login.css";
-
+import { toast } from "react-toastify";
 const Signup = ({ handleChange }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [shopifyaccesstoken, setShopifyaccesstoken] = useState("");
+  const [shopifystoredomain, setShopifystoredomain] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [shopifyApiKey, setShopifyApiKey] = useState("");
+  const [shopifyApiSecret, setShopifyApiSecret] = useState("");
+  const [shopifyStoreDomain, setShopifyStoreDomain] = useState("");
+  const [shopifyAccessToken, setShopifyAccessToken] = useState("");
   const [isChecked, setIsChecked] = useState(false);
   const [userType, setUserType] = useState('admin');
-
   const handleUserTypeChange = (e) => {
     setUserType(e.target.value);
   };
-
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
   };
-
   const handleSignUp = async (event) => {
     event.preventDefault();
-
     try {
-      if (!email || !password || !name || !confirmPassword) {
+      if (!email || !password || !name || !confirmPassword || !shopifyAccessToken || !shopifyApiKey  || !shopifyStoreDomain ) {
+        toast.error("Please provide all fields.");
         throw new Error("Please provide all fields.");
       }
-
       if (password !== confirmPassword) {
+        toast.error("Passwords do not match.");
         throw new Error("Passwords do not match.");
       }
-
       const response = await axios.post(
         `${import.meta.env.VITE_APP_API_URL}/auth/register`,
         {
@@ -38,16 +40,17 @@ const Signup = ({ handleChange }) => {
           userType,
           password,
           confirmPassword,
+          shopifyapikey:shopifyApiKey,
+          shopifyaccesstoken:shopifyAccessToken,
+          shopifystoredomain:shopifyStoreDomain
         }
       );
-
       console.log("Signup successful", response.data);
       handleChange("login");
     } catch (error) {
       console.error("Signup error", error.message);
     }
   };
-
   return (
     <div className="signup">
       <div className="login_div">Sign Up</div>
@@ -63,6 +66,28 @@ const Signup = ({ handleChange }) => {
         </div>
       </div>
       <div>
+        <label className="label_div">Shopify Access Token*</label>
+        <div className="input-div">
+          <input
+            onChange={(e) => setShopifyaccesstoken(e.target.value)}
+            type="text"
+            placeholder="Shopify Access Token*"
+            value={shopifyaccesstoken}
+          />
+        </div>
+      </div>
+      <div>
+        <label className="label_div">Shopify Store Domain*</label>
+        <div className="input-div">
+          <input
+            onChange={(e) => setShopifystoredomain(e.target.value)}
+            type="text"
+            placeholder="Shopify Store Domain*"
+            value={shopifystoredomain}
+          />
+        </div>
+      </div>
+      <div>
         <label className="label_div">Email*</label>
         <div className="input-div">
           <input
@@ -73,7 +98,7 @@ const Signup = ({ handleChange }) => {
           />
         </div>
       </div>
-      <div className="usertype">
+      {/* <div className="usertype">
         <label className="label_div">User Type</label>
         <div className="input-div border d-flex justify-content-between">
           {" "}
@@ -87,7 +112,7 @@ const Signup = ({ handleChange }) => {
             <option value="super-admin">Super Admin</option>
           </select>
         </div>
-      </div>
+      </div> */}
       <div>
         <label className="label_div">Password*</label>
         <div className="input-div border d-flex justify-content-between">
@@ -100,7 +125,6 @@ const Signup = ({ handleChange }) => {
           />
         </div>
       </div>
-
       <div>
         <label className="label_div">Confirm Password*</label>
         <div className="input-div border d-flex justify-content-between">
@@ -110,6 +134,50 @@ const Signup = ({ handleChange }) => {
             type="password"
             placeholder="Confirm Password*"
             value={confirmPassword}
+          />
+        </div>
+      </div>
+      <div>
+        <label className="label_div">Shopify Api Key*</label>
+        <div className="input-div">
+          <input
+            onChange={(e) => setShopifyApiKey(e.target.value)}
+            type="text"
+            placeholder="Shopify Api Key*"
+            value={shopifyApiKey}
+          />
+        </div>
+      </div>
+      {/* <div>
+        <label className="label_div">Shopify Api Secret*</label>
+        <div className="input-div">
+          <input
+            onChange={(e) => setShopifyApiSecret(e.target.value)}
+            type="text"
+            placeholder="Shopify Api Secret*"
+            value={shopifyApiSecret}
+          />
+        </div>
+      </div> */}
+      <div>
+        <label className="label_div">Shopify Store Domain*</label>
+        <div className="input-div">
+          <input
+            onChange={(e) => setShopifyStoreDomain(e.target.value)}
+            type="text"
+            placeholder="Name*"
+            value={shopifyStoreDomain}
+          />
+        </div>
+      </div>
+      <div>
+        <label className="label_div">Shopify Access Token*</label>
+        <div className="input-div">
+          <input
+            onChange={(e) => setShopifyAccessToken(e.target.value)}
+            type="text"
+            placeholder="Name*"
+            value={shopifyAccessToken}
           />
         </div>
       </div>
@@ -138,5 +206,4 @@ const Signup = ({ handleChange }) => {
     </div>
   );
 };
-
 export default Signup;

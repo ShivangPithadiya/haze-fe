@@ -9,7 +9,6 @@ import {
   Image as KonvaImage,
 } from "react-konva";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import Konva from "konva";
 import { useLocation } from "react-router-dom";
 import "./AddImage.css";
@@ -18,7 +17,7 @@ import { FaRegShareFromSquare } from "react-icons/fa6";
 import { set } from "lodash";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { HiChevronDoubleLeft, HiChevronDoubleRight } from "react-icons/hi";
-
+import CustomizerTitle from "../LayerTitle";
 
 const AddImage = () => {
   const [downloadedImageLink, setDownloadedImageLink] = useState("");
@@ -41,7 +40,12 @@ const AddImage = () => {
   const customizeProduct = useSelector(
     (state) => state?.customizeProduct?.layerData
   );
+  const[SelectedCustomizerData, setSelectedCustomizerData] = useState([]);
+
+
+  
   const preview = useSelector((state) => state?.customizeProduct?.preview?.images);
+// const SelectedCustomizerData = JSON.parse(localStorage.getItem("SelectedCustomizerData"));
 
   const [tempImage, setTempImage] = useState(null);
   const ImageToColor = useSelector(
@@ -58,6 +62,11 @@ const maximumtraverse = preview?.length;
   const location = useLocation(); // Get the location object
   const query = new URLSearchParams(location.search);
   const productType = query.get("productType");
+  const [customizerLayerPanel, setCustomizerLayerPanel] = useState({});
+  const [customizerLayerList, setCustomizerLayerList] = useState({});
+    const [customizerPrice, setCustomizerPrice] = useState({});
+  const [customizerZoom, setCustomizerZoom] = useState({});
+  const [customizerOutOfStock, setCustomizerOutOfStock] = useState({});
 
   const dispatch = useDispatch();
   const handleDownloadClick = () => {
@@ -95,7 +104,50 @@ const maximumtraverse = preview?.length;
   const handleColorChange = (event) => {
     setSelectedColor(event.target.value);
   };
+  useEffect(() => {
+  const SelectedCustomizerData1 = JSON.parse(localStorage.getItem("SelectedCustomizerData"));
+  console.log("SelectedCustomizerData1 ",SelectedCustomizerData1 )
+  setSelectedCustomizerData(SelectedCustomizerData1);
+}, [SelectedCustomizerData]);
 
+const ProductDetails = SelectedCustomizerData?.ProductDetails;
+  const customizerData = SelectedCustomizerData;
+   const [isMobile, setIsMobile] = useState(false);
+
+
+  useEffect(() => {
+    setCustomizerLayerPanel({
+      backgroundColor: customizerData?.LayersPanel?.LayersPanelBackgroundColor,
+      border:
+        customizerData?.LayersPanel?.LayersPanelBorderThickness +
+        " solid " +
+        customizerData?.LayersPanel?.LayersPanelBorderColor,
+      PanelPosition: customizerData?.LayersPanel?.LayersPanelPosition,
+    });
+    setCustomizerLayerList({
+      color: customizerData?.LayersList?.LayersListFontColor,
+    });
+    setCustomizerPrice({});
+    setCustomizerZoom({
+      fillColor: customizerData?.Zoom?.ZoomColor,
+    });
+    setCustomizerOutOfStock({
+      fillColor: customizerData?.OutOfStock?.OutOfStockBadgeIconColor,
+      iconBackgroundColor:
+        customizerData?.OutOfStock?.OutOfStockBadgeBackgroundColor,
+    });
+  }, [customizerData, isMobile]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   //  const handleColorClick = (color) => {
   //    setSelectedColor(color.color);
   //    applyColorToImage(productImage, color.color);
@@ -586,9 +638,17 @@ const handleNext = () => {
             <div className="products_col">
               <div className="droducts_col_title">
                 <p className="m-4 mb-5">
-                  {product_name && product_name.length > 0
+                  {ProductDetails ? <CustomizerTitle layerData={ProductDetails} /> :<>{product_name && product_name.length > 0
+                    ? <p className="products_wrapper_tile caption-top  col_padding">{product_name}</p>
+                    : <p className="products_wrapper_tile caption-top  col_padding">Product Name</p>}</>}
+                  
+                  
+
+
+                  {/* <CustomizerTitle layerData={ProductDetails} /> */}
+                  {/* {product_name && product_name.length > 0
                     ? product_name
-                    : "Product Name"}
+                    : "Product Name"} */}
                 </p>{" "}
                 <br />
               </div>
@@ -765,15 +825,12 @@ const handleNext = () => {
           </>
         ) : (
           <>
-            <div className="products_col">
-              <div className="droducts_col_title">
-                <p className="m-4 mb-5">
-                  {product_name && product_name.length > 0
-                    ? product_name
-                    : "Product Name"}
-                </p>{" "}
-                <br />
-              </div>
+           <div className="products_col prod_col" style={customizerLayerPanel}>
+               
+                 {ProductDetails ? <CustomizerTitle layerData={ProductDetails} /> :<>{product_name && product_name.length > 0
+                    ?  <p className="products_wrapper_tile caption-top  col_padding">{product_name}</p>
+                    : <p className="products_wrapper_tile caption-top  col_padding">Product Name</p>}</>}
+               
 
               {customizeProduct.map((layer) => (
                
@@ -784,7 +841,11 @@ const handleNext = () => {
                       <p className="p-head">
                         
                         {layer.dispalyType === "Colour" &&
-                          (layer.imageTitle || "Untitled Image")
+                           <div className="products_wrapper_tag" style={customizerLayerList}>
+                        { (layer.imageTitle || "Untitled ")}
+                          </div>
+                         
+                          
                           }
                       </p>
                       <div
@@ -878,7 +939,9 @@ const handleNext = () => {
                               
 
                               }
-                              {layer.labeType && <p> {layer?.imageTitle} </p>}
+                              {layer.labeType && <p>  <div className="products_wrapper_tag" style={customizerLayerList}>
+                        {layer.imageTitle}
+                          </div> </p>}
                             </div>
                           ))}{" "}
                         {layer.InputType === "Dropdown" &&
