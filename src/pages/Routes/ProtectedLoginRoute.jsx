@@ -5,15 +5,13 @@ const ProtectedLoginRoute = () => {
   const user = useSelector((state) => state.user.user);
 
   if (user == null) {
-    return(
+    return (
       <Outlet />
-    )
-  }else{
-    return(
+    );
+  } else {
+    return (
       <Navigate to={'/dashboard'} />
-    )
+    );
   }
-
-  // return  user != null ? <Outlet /> : ;
 };
 export default ProtectedLoginRoute;

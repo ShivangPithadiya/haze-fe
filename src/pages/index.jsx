@@ -13,6 +13,7 @@ import PrintingMethodsAdd from "./PrintingMethodsAdd";
 import SavedDesigns from "./SavedDesigns";
 import AddImage from "./ProductCustomizer/AddImage/AddImage"
 import PricingDetails from "./ProductCustomizer/PricingDetails"
+import ManageUser from "./ManageUser";
 import ThemeAddProduct from "./Theme1/ThemeAddProduct";
 import ThemeAddProduct2 from "./Theme1/TheneAddProduct2";
 import ThemeBuilder from "./ThemeBuilder";
@@ -46,5 +47,6 @@ export default {
   ThemeBuilder,
   YourProfile,
   UserManagement,
+  ManageUser,
   ProductDeatil
 };

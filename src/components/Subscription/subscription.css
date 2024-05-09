@@ -48,7 +48,7 @@ table tr {
     font-size: 12px;
 }
 /* Default background gradient for the switch */
-.form-check.form-switch {
+table .form-check.form-switch {
     position: relative;
     display: inline-block;
     width: 50px; /* Adjust width as needed */
@@ -56,7 +56,7 @@ table tr {
   }
   
   /* Default background gradient for the switch */
-  .form-check-input[type="checkbox"] {
+  table .form-check-input[type="checkbox"] {
     position: absolute;
     left: 0;
     top: 0;
@@ -64,7 +64,7 @@ table tr {
   }
   
   /* Default background gradient for the switch */
-  .form-check-label {
+  table .form-check-label {
     position: relative;
     display: block;
     width: 38px;
@@ -76,7 +76,7 @@ table tr {
   }
   
   /* Toggle circle */
-  .form-check-label::before {
+  table .form-check-label::before {
     content: '';
     position: absolute;
     left: 0px;

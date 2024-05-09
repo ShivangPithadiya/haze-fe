@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import Login from "../components/Login";
 import Signup from "../components/Signup";
 import sv1 from "../assets/Image/hazelogo.svg";
-
+import { Navigate, Outlet } from "react-router-dom";
 
 
 const Authenticate = () => {
@@ -17,7 +17,7 @@ const Authenticate = () => {
 
   useEffect(() => {
     if (user) {
-      window.location.replace('/dashboard');
+       <Navigate to={'/dashboard'} />
     }
   }, [user]);
 

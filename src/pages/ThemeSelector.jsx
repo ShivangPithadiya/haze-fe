@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link} from "react-router-dom";
 import "./ThemeSelector.css";
 import Slider from "react-slick";
 import axios from "axios";
@@ -100,9 +101,9 @@ const ThemeSelector = () => {
   return (
     <>
       <div className="container-fluid Haze_header">
-        <a href="/dashboard">
+        <Link to="/dashboard">
           <img src="assets/Image/close.png" alt="Close" />
-        </a>
+        </Link>
       </div>
       <div className="container-fluids">
         <div className="theme__selector__top">

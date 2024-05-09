@@ -285,36 +285,6 @@ const DashboardMain = (props) => {
 
         <div className="home_section2">
           <div className="homw_section_row">
-            <div className="home_section_col recentorderdiv">
-              <div className="home_section_title">Recent Orders</div>
-              <div className="data_scroll_bar">
-                <div className="data_scroll">
-                  {orders?.slice(0, 5)?.map((order, index) => (
-                    <div className="home_Recent_Orders_section" key={index}>
-                      <div className="home_recnet_orders_row">
-                        <div className="home_recnet_orders_col">
-                          <div className="home_recnet_orders_tag">
-                            #{order.order_number} {order.line_items[0].title}
-                          </div>
-                          <div className="home_recnet_orders_info">
-                            {/* Format the date accordingly */}
-                            {order.created_at} {order.line_items.length} item(s)
-                          </div>
-                        </div>
-                        <div className="home_recnet_orders_col">
-                          <div className="home_recnet_orders_status">
-                            {order.financial_status}
-                          </div>
-                          <div className="home_recnet_orders_amount">
-                            ${order.current_total_price}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
 
             <div className="home_section_col recentorderdiv">
               <div className="home_section_title">Recent Orders</div>

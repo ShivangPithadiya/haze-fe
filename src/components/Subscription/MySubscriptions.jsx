@@ -7,7 +7,34 @@ import axios from "axios";
 const MySubscriptions = () => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
 
+  const handleSelectAll = (event) => {
+    const isChecked = event.target.checked;
+    setSelectAll(isChecked);
+    if (isChecked) {
+      // If select all checkbox is checked, select all rows
+      const allIndices = Array.from({ length: filteredUsers.length }, (_, i) => i);
+      setSelectedRows(allIndices);
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleRowSelect = (index) => {
+    let updatedSelectedRows;
+    if (selectedRows.includes(index)) {
+      // If already selected, remove from selectedRows
+      updatedSelectedRows = selectedRows.filter((i) => i !== index);
+    } else {
+      // If not selected, add to selectedRows
+      updatedSelectedRows = [...selectedRows, index];
+    }
+    setSelectedRows(updatedSelectedRows);
+    // If all rows are selected, check the "select all" checkbox
+    setSelectAll(updatedSelectedRows.length === filteredUsers.length);
+  };
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -62,10 +89,10 @@ const MySubscriptions = () => {
           <div className="table-responsive">
             <table className="table">
               <thead>
-                <tr className='gap-2  t_head'>
+                <tr className="gap-2 t_head">
                   <th scope="col" className="border-0">
                     <div className="p-2">
-                      <input type="checkbox" />
+                      <input type="checkbox" checked={selectAll} onChange={handleSelectAll} />
                     </div>
                   </th>
                   {[
@@ -75,7 +102,7 @@ const MySubscriptions = () => {
                     { label: 'Domain Name', className: 'border-0 px-2', divClassName: 'py-2' },
                     { label: 'Store Sales', className: 'border-0 px-2', divClassName: 'py-2' },
                     { label: 'Subscription Plan', className: 'border-0 px-2', divClassName: 'py-2' },
-                    { label: 'Activate/Deactivate', className: 'border-0 px-2', divClassName: 'py-2' }
+                    { label: 'Activate/Deactivate', className: 'border-0 px-2', divClassName: 'py-2' },
                   ].map((column, index) => (
                     <th key={index} scope="col" className={column.className}>
                       <div className={column.divClassName}>{column.label}</div>
@@ -85,26 +112,43 @@ const MySubscriptions = () => {
               </thead>
               <tbody>
                 {filteredUsers.length > 0 ? (filteredUsers.map((userData, index) => (
-                  <tr className="t_body" key={index}>
-                    <td className="border-0">
-                      <div className="p-2">
-                        <input type="checkbox" />
-                      </div>
-                    </td>
-                    <td className="border-0 p-2">{index + 1}.</td>
-                    <td className="border-0 py-2">{userData.name}</td>
-                    <td className="border-0 px-2 py-2">-</td>
-                    <td className="border-0 px-2 py-2">{userData.shopifystoredomain}</td>
-                    <td className="border-0 px-2 py-2">-</td>
-                    <td className="border-0 px-2 py-2">-</td>
-                    <td className="border-0">
-                      <div className="form-check form-switch">
-                        <input className="form-check-input" type="checkbox" id={`flexSwitchCheckDefault-${index}`} checked={userData.status === 'active'} />
-                        <label className="form-check-label" htmlFor={`flexSwitchCheckDefault-${index}`}></label>
-                      </div>
+                    <tr className="t_body" key={index}>
+                      <td className="border-0">
+                        <div className="p-2">
+                          <input
+                            type="checkbox"
+                            checked={selectAll || selectedRows.includes(index)}
+                            onChange={() => handleRowSelect(index)}
+                          />
+                        </div>
+                      </td>
+                      <td className="border-0 p-2">{index + 1}.</td>
+                      <td className="border-0 py-2">{userData.name}</td>
+                      <td className="border-0 px-2 py-2">-</td>
+                      <td className="border-0 px-2 py-2">{userData.shopifystoredomain}</td>
+                      <td className="border-0 px-2 py-2">-</td>
+                      <td className="border-0 px-2 py-2">-</td>
+                      <td className="border-0">
+                        <div className="form-check form-switch">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id={`flexSwitchCheckDefault-${index}`}
+                            checked={userData.status === 'active'}
+                            readOnly
+                          />
+                          <label className="form-check-label" htmlFor={`flexSwitchCheckDefault-${index}`}></label>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td>
+                      <strong>No data found </strong>
                     </td>
                   </tr>
-                ))) : <><tr><td><strong>No data found </strong></td></tr></>}
+                )}
               </tbody>
             </table>
             <div className="active_deactive"><button className="btn p-0">Activate | Deactivate</button></div>

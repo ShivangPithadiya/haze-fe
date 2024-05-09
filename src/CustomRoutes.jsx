@@ -177,6 +177,14 @@ const CustomRoutes = [
     loginRequired: true,
 
   },
+    {
+    path: "/user-manage",
+    exact: true,
+    layout: Layout.DefaultLayout,
+    component: Page.ManageUser,
+    loginRequired: true,
+
+  },
   {
     path: "/:page",
     exact: true,
