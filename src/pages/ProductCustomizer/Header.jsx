@@ -186,7 +186,8 @@ const Header = () => {
 					const DataUpdated = {
 						_id: response.data._id,
 						title: product_name,
-						layerdata: Layer.map(layer => ({ ...layer }))
+						layerdata: Layer.map(layer => ({ ...layer })),
+						
 					}
 					axios.patch(`${import.meta.env.VITE_APP_API_URL}/data/layerdata/${Productselectedid}`, DataUpdated)
 						.then((response) => {
@@ -223,7 +224,8 @@ const Header = () => {
 					// Update product ID in layer data
 					const d1={
 						_id: response.data.product.id,
-						...updatedLayerData
+						...updatedLayerData,
+						created_by: user?._id
 					}
 					console.log("Updated Layer Data:", updatedLayerData);
 

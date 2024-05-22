@@ -5,6 +5,7 @@ import Slider from 'react-slick';
 import { callApi } from '../api/ApiHelper';
 import CustomDots from '../components/themebuilder/MainComponent/CustomDots';
 import AddToCart from './AddToCart';
+import axios from 'axios';
 
 const ProductDetail = () => {
   const { productId } = useParams();
@@ -16,7 +17,10 @@ const ProductDetail = () => {
  const[SelectedCustomizerData, setSelectedCustomizerData] = useState([]);
    const [customizerLayerPanel, setCustomizerLayerPanel] = useState({});
   const [customizerLayerList, setCustomizerLayerList] = useState({});
+  const[findUserid, setFindUserid] = useState(null);
+  const[shopifyStoredomain, setShopifyStoredomain] = useState(null);
    const [customizerPrice, setCustomizerPrice] = useState({});
+   const[ProductVariantid, setProductVariantid] = useState(null);
   const handleImageClick = (index) => {
     setSelectedLayer([productData.layerdata[index]]);
     console.log('Selected Layer:', productData.layerdata[index]);
@@ -121,22 +125,49 @@ const ProductDetail = () => {
   useEffect(() => {
     if (callingApi) {
       setCallingApi(false);
-      callApi(`/shopify/products/${productId}`, { method: 'GET', data: {} }).then((res) => {
-        setProductDetail(res?.product);
-        console.log('res', res);
-      });
-
-      callApi(`/data/customizerData/${productId}`, { method: 'GET', data: {} }).then((res) => {
-        localStorage.setItem('SelectedCustomizerData', JSON.stringify(res));
-        localStorage.setItem('SelectedId', productId);
-        console.log('reswwwwwwwwww', res);
-      }
-    );
-
-
-      callApi(`/data/ProductData/${productId}`, { method: 'GET', data: {} }).then((res) => {
+      callApi(`/data/ProductData/${productId}`, {
+        method: "GET",
+        data: {},
+      }).then((res) => {
         setProductData(res);
-        console.log('res', res);
+        console.log("res", res);
+        setFindUserid(res.created_by);
+       
+axios
+  .get(`${import.meta.env.VITE_APP_API_URL}/profile/getuser/${res.created_by}`)
+  .then((res) => {
+    console.log("res", res);
+    setFindUserid(res.data.user);
+
+    setShopifyStoredomain(res.data.user.shopifyStoredomain);
+    console.log("res.data.shopifyStoredomain", res.data.user.shopifystoredomain);
+    const domain = res.data.user.shopifystoredomain;
+    const token = res.data.user.shopifyaccesstoken;
+   
+    //set domain localstorage
+
+    localStorage.setItem("shopifyStoredomain", domain);
+  
+      axios
+        .get(
+          `${import.meta.env.VITE_APP_API_URL}/shopify/products/${productId}`,
+          {
+            headers: {
+              shopifyStoredomain: domain,
+              shopifyAccessToken: token,
+            },
+          }
+        )
+        .then((res) => {
+          setProductDetail(res.data?.product);
+          setProductVariantid(res.data?.product?.variants[0].id);
+          localStorage.setItem(
+            "productVariantid",
+            res.data.product.variants[0].id
+          );
+          
+        });
+  });
 
         const originalImgs = {};
         res.layerdata.forEach((layer) => {
@@ -144,8 +175,23 @@ const ProductDetail = () => {
         });
         setOriginalImages(originalImgs);
       });
+
+      callApi(`/data/customizerData/${productId}`, { method: 'GET', data: {} }).then((res) => {
+        localStorage.setItem('SelectedCustomizerData', JSON.stringify(res));
+        localStorage.setItem('SelectedId', productId);
+        console.log('reswwwwwwwwww', res);
+      }
+ 
+
+  
+   );
+
+ 
+      
     }
   }, [callingApi]);
+
+
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -337,7 +383,7 @@ const ProductDetail = () => {
                 </Slider>
               ))}
             </div>
-          <AddToCart  />
+          <AddToCart   />
           </div>
         </div>
       </div>

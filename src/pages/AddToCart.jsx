@@ -11,19 +11,21 @@ const AddToCart = () => {
   const navigate = useNavigate();
 
    const handleAddToCart = async () => {
+    // get domain and varian id from local storage
+
    
-   const variantId = 48666290848027;
-    const shopDomain = "hazetest.myshopify.com";
+   const variantId = localStorage.getItem("productVariantid");
+    const shopDomain = localStorage.getItem("shopifyStoredomain");
     try {
       const response = await axios.post(`${import.meta.env.VITE_APP_API_URL}/shopify/cart`, 
       {
         Details: {
           variant_id: variantId,
           shopDomain: shopDomain
-
          }
       });
         window.location.href = response.data;
+        window.open(`${response.data}`, "_blank");
 
       console.log("response", response);
 

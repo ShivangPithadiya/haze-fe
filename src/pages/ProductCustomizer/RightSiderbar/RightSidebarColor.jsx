@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useRef} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ColorPicker from "./ColorPiker";
 import { SketchPicker } from "react-color";
@@ -37,6 +37,7 @@ const RightSidebarColor = () => {
   const ActiveLayerData = useSelector(
     (state) => state?.customizeProduct?.activeLayerData
   );
+  const modalRef = useRef(null);
   const[previousLayerId, setPreviousLayerId]=useState(null);
 
   const [idCounter, setIdCounter] = useState(0);
@@ -260,6 +261,24 @@ useEffect(() => {
     setThumbnailShow(event.target.checked);
   };
 
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (modalRef.current && !modalRef.current.contains(event.target)) {
+           setCreateColorModal(false);
+        }
+      };
+
+      if (createColorModal) {
+        document.addEventListener("mousedown", handleClickOutside);
+      } else {
+        document.removeEventListener("mousedown", handleClickOutside);
+      }
+
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, [createColorModal]);
+
   return (
     <>
       <div class="add_theme_inner_container">
@@ -293,8 +312,13 @@ useEffect(() => {
               height: "100%",
             }}
           ></div>
-          <input class="file_select_title" style={{border:"none",height:"28px"}} value={titleKeyPress}  onChange={handleTitleKeyPress} type="text"  
-          placeholder="Untiteld Colour"
+          <input
+            class="file_select_title"
+            style={{ border: "none", height: "28px" }}
+            value={titleKeyPress}
+            onChange={handleTitleKeyPress}
+            type="text"
+            placeholder="Untiteld Colour"
           />
           <span class="file_select_icon">
             <button type="button" className="" onClick={handleShow}>
@@ -584,7 +608,7 @@ useEffect(() => {
       <>
         {createColorModal && (
           <div className="side-modal-div " style={{ height: "300px" }}>
-            <div className="modal-dialog" role="document">
+            <div className="modal-dialog" role="document" ref={modalRef}>
               <div className="modal-content px-3">
                 <form id="imageForm" className="form_image">
                   <div class="creat_modal_section">
@@ -697,7 +721,7 @@ useEffect(() => {
             >
               <div class="creat_modal_producat">
                 <span class="creat_modal_icon">
-                  <img src={uploadedImage}  width={17} />
+                  <img src={uploadedImage} width={17} />
                 </span>
                 <span class="creat_modal_name">
                   {createColorLayer
