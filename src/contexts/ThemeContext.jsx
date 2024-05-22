@@ -19,6 +19,7 @@ const ThemeProvider = (props) => {
       setCustomizerData(storedData);
     }
     else{
+      
       setCustomizerData(Utils.initialCustomizerData);
     }
   }, [selectedProductId]);

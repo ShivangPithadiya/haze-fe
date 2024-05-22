@@ -171,44 +171,46 @@ const Header = () => {
 		};
 		setShowModal1(true);
 		// Iterate through layers
-		for (const layer of updatedLayerData.layerdata) {
-			// Check if display type is image
-			if (layer.dispalyType === "Image") {
-				console.log("Image Thumbnail:", layer.Thumbailimage);
-				console.log("Images:", layer.images);
-				// Upload thumbnail image to Cloudinary and update URL
-				try {
-					const thumbnailUrl = await imgToCloudinary(layer.Thumbailimage);
-					layer.Thumbailimage = thumbnailUrl; // Update thumbnail URL in copied layer object
-					console.log("Thumbnail uploaded to Cloudinary:", thumbnailUrl);
-				} catch (error) {
-					// Handle error
-					console.error("Error uploading thumbnail to Cloudinary:", error);
-				}
-				// Upload each image in layer.images to Cloudinary and update the array
-				layer.images = await Promise.all(layer.images.map(async (image) => {
-					try {
-						const imageUrl = await imgToCloudinary(image.url);
-						return { ...image, url: imageUrl }; // Create a new object with updated URL
-					} catch (error) {
-						// Handle error
-						console.error("Error uploading image to Cloudinary:", error);
-						return image; // Return the original image object if an error occurs
-					}
-				}));
-				console.log("Images uploaded to Cloudinary:", layer.images);
-			}
-		}
+	
 		console.log("updatedLayerData", updatedLayerData);
-		axios.post(`${import.meta.env.VITE_APP_API_URL}/data/layerdata`,
+		// SelectedId get from localstorage
 
-		 updatedLayerData)
-			.then((response) => {
-				console.log("Data sent successfully to layerdata:", response.data);
-				const shopifyStoredomain = user?.shopifystoredomain;
-				const shopifyaccesstoken = user?.shopifyaccesstoken;
-				axios.post(`${import.meta.env.VITE_APP_API_URL}/shopify/products`, 
-				product,
+		const Productselectedid = localStorage.getItem('SelectedId');
+		console.log('Productselectedid', Productselectedid);
+	//if productselctedid is not null then update the product
+
+		if (Productselectedid !== null && Productselectedid !== undefined && Productselectedid !== "" && Productselectedid !== "undefined" && Productselectedid !== "null") {
+			axios.patch(`${import.meta.env.VITE_APP_API_URL}/data/ProductData/${Productselectedid}`, updatedLayerData)
+				.then((response) => {
+					console.log("Data sent successfully to layerdata:", response.data);
+					const DataUpdated = {
+						_id: response.data._id,
+						title: product_name,
+						layerdata: Layer.map(layer => ({ ...layer }))
+					}
+					axios.patch(`${import.meta.env.VITE_APP_API_URL}/data/layerdata/${Productselectedid}`, DataUpdated)
+						.then((response) => {
+							console.log("Data sent successfully to layerdata:", response.data);
+						
+									
+									setShowModal1(false);
+									toast.success("The product was successfully published!");
+									})
+								
+						})
+				
+				.catch((error) => {
+					console.error("Error sending data to layer data:", error);
+					setShowModal1(false);
+					toast.error("There is a issue to publish product!");
+				});
+		}
+		else {
+			//if productselctedid is null then create the product
+
+			const shopifyStoredomain = user?.shopifystoredomain;
+			const shopifyaccesstoken = user?.shopifyaccesstoken;
+        axios.post(`${import.meta.env.VITE_APP_API_URL}/shopify/products`, product,
 				{
 					headers: {
 						"shopifyStoredomain": shopifyStoredomain,
@@ -216,8 +218,17 @@ const Header = () => {
 					}
 				}
 			)
-					.then((response) => {
-						axios.post(`${import.meta.env.VITE_APP_API_URL}/data/ProductData`, updatedLayerData)
+			.then((response) => {
+					console.log("Sending data to Shopify:", response.data);
+					// Update product ID in layer data
+					const d1={
+						_id: response.data.product.id,
+						...updatedLayerData
+					}
+					console.log("Updated Layer Data:", updatedLayerData);
+
+
+		axios.post(`${import.meta.env.VITE_APP_API_URL}/data/ProductData`, d1)
 						.then((response) => {
 
 							console.log("Data sent successfully to layerdata:", response.data);
@@ -231,43 +242,41 @@ const Header = () => {
 								Authorization: `Bearer ${authToken}`
 							}
 							})
-						})
-						console.log("Sending data to Shopify:", response.data);
+							const DataUpdated ={
+								_id: response.data._id,
+								title: product_name,
+			layerdata: Layer.map(layer => ({ ...layer }))
+							}
+								axios.post(`${import.meta.env.VITE_APP_API_URL}/data/layerdata`, DataUpdated )
+								.then((response) => {
+									console.log("Data sent successfully to layerdata:", response.data);
+				
+		
 						setShowModal1(false);
 						toast.success("The product was successfully published!");
 						navigate('/product-pricing-details')
-					})
-					.catch((error) => {
-						console.error("Error sending data to Shopify:", error);
-						setShowModal1(false);
-					});
-			})
+
+			
+			
+					}
+				)
+						})
 			.catch((error) => {
 				console.error("Error sending data to layer data:", error);
 				setShowModal1(false);
 				toast.error("There is a issue to publish product!");
 			});
-	};
-	const imgToCloudinary = async (image) => {
-		try {
-			const response = await fetch(image);
-			const blob = await response.blob();
-			const file = new File([blob], "image.jpg", { type: 'image/jpeg' });
-			const formData = new FormData();
-			formData.append("file", file);
-			formData.append("upload_preset", "Images");
-			formData.append("cloud_name", "dmew5rudk");
-			// Upload file to Cloudinary
-			const res = await axios.post(
-				"https://api.cloudinary.com/v1_1/dmew5rudk/image/upload",
-				formData
-			);
-			return res.data.secure_url;
-		} catch (error) {
-			console.error("Error uploading image to Cloudinary:", error);
-			throw error;
 		}
+	)
+		.catch((error) => {
+			console.error("Error sending data to shopify:", error);
+			setShowModal1(false);
+			toast.error("There is a issue to publish product!");
+		});
+	}
+
 	};
+	
 	const handleClose = () => {
 		setShowModal(false)
 		setShowResetModal(false)

@@ -58,3 +58,9 @@
 .add_theme_inner_container_select option{
     border: 1px solid red;
 }
+/* 
+.color_div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+} */

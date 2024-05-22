@@ -6,7 +6,7 @@
   margin: auto;
   border-radius: 5px;
   width: 478px;
-  height: 464px;
+  /* height: 464px; */
   top: 232px;
   left: 481px;
 }
@@ -59,7 +59,7 @@ text-align: left;
 .input-div {
   border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
   border-radius: 3px;
-  padding: 12px;
+  /* padding: 12px; */
   margin-bottom: 15px;
   margin-top: 10px;
 }

@@ -42,7 +42,12 @@ const AddImage = () => {
   );
   const[SelectedCustomizerData, setSelectedCustomizerData] = useState([]);
 
-
+ const toggleAccordion = (index) => {
+    setOpenAccordions((prev) =>
+      prev.includes(index) ? prev.filter((item) => item !== index) : [...prev, index]
+    );
+  };
+    const [openAccordions, setOpenAccordions] = useState([]);
   
   const preview = useSelector((state) => state?.customizeProduct?.preview?.images);
 // const SelectedCustomizerData = JSON.parse(localStorage.getItem("SelectedCustomizerData"));
@@ -106,7 +111,7 @@ const maximumtraverse = preview?.length;
   };
   useEffect(() => {
   const SelectedCustomizerData1 = JSON.parse(localStorage.getItem("SelectedCustomizerData"));
-  console.log("SelectedCustomizerData1 ",SelectedCustomizerData1 )
+ 
   setSelectedCustomizerData(SelectedCustomizerData1);
 }, [SelectedCustomizerData]);
 
@@ -153,129 +158,104 @@ const ProductDetails = SelectedCustomizerData?.ProductDetails;
   //    applyColorToImage(productImage, color.color);
   //  };
 
-const handleColorClick = (e, color) => {
-  let colorId = null;
-   setSelectedColor(color.color);
 
-  // Find the layer ID associated with the clicked color
-  customizeProduct.forEach((item) => {
-    if (item.layerId === color.id) {
-      colorId = item.layerId;
-    }
-  });
+  const fetchImageAndApplyColor = async (imageUrl, selectedColor) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve, reject) => {
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(blob);
+      const base64Image = await base64Promise;
 
-  // Apply the selected color to the image associated with the layer ID
-  applyColorToImage(colorId, color.color);
-};
+      const img = new Image();
+      img.src = base64Image;
 
-const fetchImageAndApplyColor = async (imageUrl, selectedColor) => {
-  try {
-    const response = await fetch(imageUrl);
-    const blob = await response.blob();
-    const reader = new FileReader();
-    const base64Promise = new Promise((resolve, reject) => {
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-    });
-    reader.readAsDataURL(blob);
-    const base64Image = await base64Promise;
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
 
-    const img = new Image();
-    img.src = base64Image;
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
 
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
-    });
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    const canvas = document.createElement('canvas');
-    canvas.width = img.width;
-    canvas.height = img.height;
-    const ctx = canvas.getContext('2d');
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = img.width;
+      tempCanvas.height = img.height;
+      const tempCtx = tempCanvas.getContext('2d');
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+      tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+      const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+      const data = imageData.data;
 
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const targetColor = [255, 255, 255, 255];
+      const tolerance = 10;
 
+      for (let i = 0; i < data.length; i += 4) {
+        const redDiff = Math.abs(data[i] - targetColor[0]);
+        const greenDiff = Math.abs(data[i + 1] - targetColor[1]);
+        const blueDiff = Math.abs(data[i + 2] - targetColor[2]);
+        const alphaDiff = Math.abs(data[i + 3] - targetColor[3]);
+        const totalDiff = redDiff + greenDiff + blueDiff + alphaDiff;
 
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = img.width;
-    tempCanvas.height = img.height;
-    const tempCtx = tempCanvas.getContext('2d');
-
-    tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
-
-    const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-    const data = imageData.data;
-
-    const targetColor = [255, 255, 255, 255]; 
-
-    const tolerance = 10; 
-    
-    for (let i = 0; i < data.length; i += 4) {
-      const redDiff = Math.abs(data[i] - targetColor[0]);
-      const greenDiff = Math.abs(data[i + 1] - targetColor[1]);
-      const blueDiff = Math.abs(data[i + 2] - targetColor[2]);
-      const alphaDiff = Math.abs(data[i + 3] - targetColor[3]);
-      const totalDiff = redDiff + greenDiff + blueDiff + alphaDiff;
-
-      if (totalDiff <= tolerance) {
-        data[i + 3] = 0;
-      }
-    }
-
-   
-    tempCtx.putImageData(imageData, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
-    ctx.globalCompositeOperation = 'source-atop';
-    ctx.fillStyle = `rgba(${hexToRgb(selectedColor)},1)`;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.globalCompositeOperation = 'multiply';
-    ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
-    const newBase64Image = canvas.toDataURL('image/png');
-
-    return newBase64Image;
-  } catch (error) {
-    console.error('Error fetching and processing image:', error);
-    return null;
-  }
-};
-
-
-const applyColorToImage = async (colorId, selectedColor) => {
-  if (colorId && selectedColor) {
-    const newImages = await Promise.all(image.map(async (img) => {
-      if (
-        showImage.some(
-          (image) => image.layerId === colorId && image.url === img.src
-        )
-      ) {
-        const newBase64Image = await fetchImageAndApplyColor(img.src, selectedColor);
-        if (newBase64Image) {
-          const newImage = new Image();
-          newImage.src = newBase64Image;
-          return newImage;
+        if (totalDiff <= tolerance) {
+          data[i + 3] = 0;
         }
       }
-      
-      return img;
-    }));
 
-    setImage(newImages);
-  }
-};
+      tempCtx.putImageData(imageData, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'source-atop';
+      ctx.fillStyle = `rgba(${hexToRgb(selectedColor)},1)`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+      const newBase64Image = canvas.toDataURL('image/png');
 
-
-
-  const handleDragEnd = (e, id) => {
-    setTextPosition({
-      x: e.target.x(),
-      y: e.target.y(),
-    });
+      return newBase64Image;
+    } catch (error) {
+      console.error('Error fetching and processing image:', error);
+      return null;
+    }
   };
 
-  const hexToRgb = (hex) => {
+  const applyColorToImage = async (colorId, selectedColor) => {
+    if (colorId && selectedColor) {
+      const newImages = await Promise.all(image.map(async (img) => {
+        if (showImage.some((image) => image.layerId === colorId && image.url === img.src)) {
+          const newBase64Image = await fetchImageAndApplyColor(img.src, selectedColor);
+          if (newBase64Image) {
+            const newImage = new Image();
+            newImage.src = newBase64Image;
+            return newImage;
+          }
+        }
+        return img;
+      }));
+      setImage(newImages);
+    }
+  };
+
+  const handleColorClick = (e, color) => {
+    let colorId = null;
+    setSelectedColor(color.color);
+    customizeProduct.forEach((item) => {
+      if (item.layerId === color.id) {
+        colorId = item.layerId;
+      }
+    });
+    applyColorToImage(colorId, color.color);
+  };
+ const hexToRgb = (hex) => {
     hex = hex?.replace(/^#/, "");
     const bigint = parseInt(hex, 16);
     const r = (bigint >> 16) & 255;
@@ -284,6 +264,15 @@ const applyColorToImage = async (colorId, selectedColor) => {
 
     return `${r}, ${g}, ${b}`;
   };
+
+  const handleDragEnd = (e, id) => {
+    setTextPosition({
+      x: e.target.x(),
+      y: e.target.y(),
+    });
+  };
+
+ 
   useEffect(() => {}, [title?.uploadedImage]);
 
   const handleLayerImage = (e, id) => {
@@ -635,46 +624,78 @@ const handleNext = () => {
                 <p>Your product will appear here</p>
               </div>
             </div>
-            <div className="products_col">
-              <div className="droducts_col_title">
-                <p className="m-4 mb-5">
-                  {ProductDetails ? <CustomizerTitle layerData={ProductDetails} /> :<>{product_name && product_name.length > 0
-                    ? <p className="products_wrapper_tile caption-top  col_padding">{product_name}</p>
+            <div className="products_col prod_col" style={customizerLayerPanel}>
+               
+                 {ProductDetails ? <CustomizerTitle layerData={ProductDetails} /> :<>{product_name && product_name.length > 0
+                    ?  <p className="products_wrapper_tile caption-top  col_padding">{product_name}</p>
                     : <p className="products_wrapper_tile caption-top  col_padding">Product Name</p>}</>}
-                  
-                  
+               
 
-
-                  {/* <CustomizerTitle layerData={ProductDetails} /> */}
-                  {/* {product_name && product_name.length > 0
-                    ? product_name
-                    : "Product Name"} */}
-                </p>{" "}
-                <br />
-              </div>
-
-              {customizeProduct.map((layer) => (
+              {customizeProduct.map((layer, index) => (
+               
                 <div key={layer.layerId}>
+
                   <p className="m-4 mb-5">{layer.displayName}</p>
                   <div className="untitle_title">
                     <div key={layer.layerId} className="row mb-3 mx-1">
-                      <p className="p-head">
+                     
+                          <div className="products_wrapper_tag__main">
+                    <div className="products__cont__three">
                         {layer.dispalyType === "Colour" &&
-                          (layer.imageTitle || "Untitled Image")}
-                      </p>
-                      <div
-                        style={{
-                          marginTop: "20px",
-                          display: "flex",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        {layer.InputType == "Thumbnail" &&
-                          layer.dispalyType == "Colour" &&
-                          layer?.colours?.map((color, index) => (
-                            <div>
-                              <div
-                                key={index}
+                           <div className="br__bttotom" style={customizerLayerList}>
+                         <div
+                onClick={() => toggleAccordion(index)}
+                className={`accordion-title ${openAccordions.includes(index) ? "open" : ""}`}
+              >
+                <h2 className="products_wrapper_tag "> {layer.imageTitle}</h2>
+              </div> <div
+                className={`accordion-content ${openAccordions.includes(index) ? "open" : ""}`}
+              >
+                <div className="colors__box">
+                   <div className="products_colour_section">
+                 {
+                  layer.colours && (
+                    <>
+                      {layer?.colours.map((color, index) => (
+                <div
+                              
+                                style={{
+                                  backgroundColor: color.color,
+                                  margin: "5px",
+                                }}
+                                className={
+                                  layer.thumbnailType
+                                    ? "upload_image_large me-3"
+                                    : "upload_image me-3"
+                                }
+                                onClick={(e) => handleColorClick(e, color)}
+                              ><div className="abb"> {layer.labeType && (
+                                <p className="uplaod_p"> {color?.colorName} </p>
+                              )}</div></div>
+                              
+                          
+              ))}
+             
+                    </>
+                  )
+                 }
+                              {/* {layer?.colours.map((color, index) => (
+                <span
+                  key={index}
+                  className="products-active"
+                  style={{ backgroundColor: color.color }}
+                  onClick={(e) => handleColorClick(e, color)}
+                ></span>
+                
+              ))} */}
+              
+                            </div>
+                </div>
+              </div>
+              {/* <div className="colors__box">
+                   <div className="products_colour_section">
+                <div
+                              
                                 style={{
                                   backgroundColor: color.color,
                                   margin: "5px",
@@ -686,11 +707,43 @@ const handleNext = () => {
                                 }
                                 onClick={(e) => handleColorClick(e, color)}
                               ></div>
+                              
                               {layer.labeType && (
                                 <p className="uplaod_p"> {color?.colorName} </p>
                               )}
                             </div>
+                </div> */}
+                          </div>
+                         
+                          
+                          }
+
+                          
+                    </div></div>
+                     
+                      <div
+                        style={{
+                          marginTop: "20px",
+                          display: "flex",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                       
+                        {/* {layer.InputType == "Thumbnail" && */}
+                          {layer.dispalyType == "Colour" &&
+                          layer?.colours?.map((color, index) => (
+                            <div className="br__bttotom" key={index}>
+                              
+              <div
+                className={`accordion-content ${openAccordions.includes(index) ? "open" : ""}`}
+              >
+                
+              </div>
+                             
+                            </div>
                           ))}
+
+                          
                         {layer.InputType === "Dropdown" &&
                           layer.dispalyType == "Colour" && (
                             <select
@@ -725,9 +778,21 @@ const handleNext = () => {
                             </div>
                           )}
                         {/* Render images */}
-                        {layer.InputType === "Thumbnail" &&
-                          layer.dispalyType === "Image" &&
-                          layer?.images?.map((image, index) => (
+                        {/* {layer.InputType === "Thumbnail" && */}
+                         <div className="products_wrapper_tag__main">
+                    <div className="products__cont__three">
+                          {layer.dispalyType === "Image" &&(
+                            <div className="br__bttotom" key={index}>
+ <div
+                onClick={() => toggleAccordion(index)}
+                className={`accordion-title ${openAccordions.includes(index) ? "open" : ""}`}
+              >
+                <h2 className="products_wrapper_tag "> {layer.imageTitle}</h2>
+              </div>
+                         <div
+                className={`accordion-content ${openAccordions.includes(index) ? "open" : ""}`}
+              >      
+                         { layer?.images?.map((image, index) => (
                             <div
                               key={index}
                               className={
@@ -736,17 +801,33 @@ const handleNext = () => {
                                   : "upload_image me-3"
                               }
                             >
-                              <img
+                            
+                              {image?.url === "" ? (
+<p></p>
+                             
+                              ) : (
+                                <img
                                 className="dummyImage"
                                 src={image.url}
                                 alt={image.imageName}
                                 height="100px"
                                 width="100px"
                                 onClick={(e) => handleLayerImage(e, image.id)}
-                              />
-                              {layer.labeType && <p> {image?.imageName} </p>}
+                              /> 
+                              )
+                              
+
+                              }
+                              {layer.labeType && <p>  <div className="products_wrapper_tag" style={customizerLayerList}>
+                        {layer.imageTitle}
+                          </div> </p>}
                             </div>
-                          ))}{" "}
+                          ))}
+                            </div>
+                              </div>
+                            
+                          )}{" "}
+                          </div></div>
                         {layer.InputType === "Dropdown" &&
                           layer.dispalyType == "Image" && (
                             <select

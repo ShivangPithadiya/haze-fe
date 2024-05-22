@@ -14,10 +14,10 @@ const Sidebar = ({ isSidebarOpen, closeNav }) => {
     "admin": [
     { name: 'Orders', url: '/orders', icon: 'assets/Image/Orders.svg' },
     { name: 'Products', url: '/my-products', icon: 'assets/Image/My Products.svg' },
-    { name: 'Pricing Rules', url: '/pricing-rules', icon: 'assets/Image/Pricing Rules.svg' },
+    // { name: 'Pricing Rules', url: '/pricing-rules', icon: 'assets/Image/Pricing Rules.svg' },
     { name: 'Theme Builder', url: '/theme-selector', icon: 'assets/Image/Theme Builder.svg' },
     { name: 'Printing Methods', url: '/printing-methods', icon: 'assets/Image/Printing Methods.svg' },
-    { name: 'Saved Designs', url: '/saved-designs', icon: 'assets/Image/Saved Designs.svg' },
+    // { name: 'Saved Designs', url: '/saved-designs', icon: 'assets/Image/Saved Designs.svg' },
     // { name: 'Settings', url: '/settings', icon: 'assets/Image/Settings.svg' },
   ],
   "retail-user": [

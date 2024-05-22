@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 import {
   setActiveLayerId,
   setLayerData,
@@ -8,6 +9,7 @@ import {
   setpreview ,
   setColorData,
 } from "../../../features/customizeProductSlice";
+import ImageCompressor from "image-compressor.js";
 const RightSidebarImage = () => {
   const addImageData = useSelector((state) => state.title);
   const ActiveLayerId = useSelector(
@@ -77,32 +79,74 @@ useEffect(()=>{},[ProductCustomizer])
       dispatch(setUpdateLayerData({ activeLayer, updatedData }));
     }
   };
-
-const handleImageChange = (e) => {
+const handleImageChange = async (e) => {
   const selectedImage = e.target.files[0];
-const objectURL = URL.createObjectURL(selectedImage);
+
   if (selectedImage) {
-    const fileExtension = selectedImage.name.split(".").pop().toLowerCase();
-    // Check if the file extension is not PNG
-    // if (fileExtension !== "png") {
-    //   alert("Only PNG images are allowed.");
-    //   return;
-    // }
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedImage);
+      formData.append('upload_preset', 'Images');
+      formData.append('cloud_name', 'dmew5rudk');
 
- const activeLayer = ProductCustomizer?.activeLayerId;
-  
+      // Compress the image before uploading (optional)
+      const compressedImage = await compressImage(selectedImage);
+      formData.set('file', compressedImage);
 
-    const updatedData = {
-     
-      Thumbailimage: objectURL
-    };
+      // Upload image to Cloudinary
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/dmew5rudk/image/upload`,
+        formData,
+        {
+          onUploadProgress: (progressEvent) => {
+            // Handle upload progress if needed
+            const progress = Math.round(
+              (progressEvent.loaded / progressEvent.total) * 100
+            );
+            console.log(`Upload Progress: ${progress}%`);
+          },
+        }
+      );
 
-    dispatch(setUpdateLayerData({ activeLayer, updatedData }));
-    
+      const imageURL = response.data.secure_url;
+      const activeLayer = ProductCustomizer?.activeLayerId;
+
+      const updatedData = {
+        Thumbailimage: imageURL,
+      };
+
+      dispatch(setUpdateLayerData({ activeLayer, updatedData }));
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
   }
 };
 
+// Function to compress the image
+const compressImage = async (image) => {
+  const maxFileSizeMB = 1; // Maximum file size in MB after compression
+  const maxSizeBytes = maxFileSizeMB * 1024 * 1024;
 
+  if (image.size <= maxSizeBytes) {
+    return image;
+  }
+
+  return new Promise((resolve, reject) => {
+    const compressor = new ImageCompressor();
+    compressor.compress(image, {
+      quality: 0.7, // Adjust quality as needed
+      maxWidth: 1920, // Set maximum width if needed
+      maxHeight: 1080, // Set maximum height if needed
+      success(result) {
+        resolve(result);
+      },
+      error(error) {
+        console.error('Error compressing image:', error);
+        reject(error);
+      },
+    });
+  });
+};
 
   // <----------------Input type ---------------------->
   const handleInputType = (event) => {
@@ -152,18 +196,37 @@ const handleTitleBlur = (e) => {
     );
 
   };
-const handelPreviewImageChange = (e, index, item) => {
+const handelPreviewImageChange = async (e, index, item) => {
   console.log("index", index);
   const selectedImage = e.target.files[0];
 
   if (selectedImage) {
-    const fileExtension = selectedImage.name.split(".").pop().toLowerCase();
-    // if (fileExtension !== "png") {
-    //   alert("Only PNG images are allowed.");
-    //   return;
-    // }
+   try {
+      const formData = new FormData();  
+      formData.append('file', selectedImage);
+      formData.append('upload_preset', 'Images');
+      formData.append('cloud_name', 'dmew5rudk');
 
-    const objectURL = URL.createObjectURL(selectedImage);
+      // Compress the image before uploading (optional)
+      const compressedImage = await compressImage(selectedImage);
+       formData.set('file', compressedImage);
+
+      // Upload image to Cloudinary
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/dmew5rudk/image/upload`,
+        formData,
+        {
+          onUploadProgress: (progressEvent) => {
+            // Handle upload progress if needed
+            const progress = Math.round(
+              (progressEvent.loaded / progressEvent.total) * 100
+            );
+            console.log(`Upload Progress: ${progress}%`);
+          },
+        }
+      );
+
+    const objectURL = response.data.secure_url;
     console.log("objectURL", objectURL);
     localStorage.setItem(
       "selectedData",
@@ -208,6 +271,10 @@ console.log("existingData",existingData)
       ])
     );
   }
+  catch (error) {
+    console.error('Error uploading image:', error);
+  }
+}
 };
 
 // };

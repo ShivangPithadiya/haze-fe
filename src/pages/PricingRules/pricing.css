@@ -41,25 +41,22 @@
     right: 0;
     bottom: 0;
     background-color: white;
-    /* White background */
-    border-radius: 34px;
-    /* Rounded corners */
+    border-radius: 39px;
     border: 1px solid #FF0F7B;
     transition: background-color 0.4s;
-    width: 33px;
-    height: 16px;
+    width: 41px;
+    height: 20px;
 }
 
 /* Style the circle handle */
 .custom-toggle .toggle-handle {
     position: absolute;
-    top: 0px;
-    left: -10px;
-    width: 14px;
+    top: 2px;
+    left: 0px;
+    width: 13px;
     height: 14px;
     background: linear-gradient(90deg, #FF0F7B 0%, #F8932D 100%);
     border-radius: 50%;
-    /* Circle shape */
     transition: transform 0.4s;
 }
 /* Move the circle handle based on checkbox state */

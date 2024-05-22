@@ -14,7 +14,7 @@ const Signup = ({ handleChange }) => {
   const [shopifyStoreDomain, setShopifyStoreDomain] = useState("");
   const [shopifyAccessToken, setShopifyAccessToken] = useState("");
   const [isChecked, setIsChecked] = useState(false);
-  const [userType, setUserType] = useState('admin');
+  const [userType, setUserType] = useState('store-owner');
   const handleUserTypeChange = (e) => {
     setUserType(e.target.value);
   };
@@ -24,7 +24,7 @@ const Signup = ({ handleChange }) => {
   const handleSignUp = async (event) => {
     event.preventDefault();
     try {
-      if (!email || !password || !name || !confirmPassword || !shopifyAccessToken || !shopifyApiKey  || !shopifyStoreDomain ) {
+      if (!email || !password || !name || !confirmPassword) {
         toast.error("Please provide all fields.");
         throw new Error("Please provide all fields.");
       }
@@ -40,9 +40,6 @@ const Signup = ({ handleChange }) => {
           userType,
           password,
           confirmPassword,
-          shopifyapikey:shopifyApiKey,
-          shopifyaccesstoken:shopifyAccessToken,
-          shopifystoredomain:shopifyStoreDomain
         }
       );
       console.log("Signup successful", response.data);
@@ -62,28 +59,6 @@ const Signup = ({ handleChange }) => {
             type="text"
             placeholder="Name*"
             value={name}
-          />
-        </div>
-      </div>
-      <div>
-        <label className="label_div">Shopify Access Token*</label>
-        <div className="input-div">
-          <input
-            onChange={(e) => setShopifyaccesstoken(e.target.value)}
-            type="text"
-            placeholder="Shopify Access Token*"
-            value={shopifyaccesstoken}
-          />
-        </div>
-      </div>
-      <div>
-        <label className="label_div">Shopify Store Domain*</label>
-        <div className="input-div">
-          <input
-            onChange={(e) => setShopifystoredomain(e.target.value)}
-            type="text"
-            placeholder="Shopify Store Domain*"
-            value={shopifystoredomain}
           />
         </div>
       </div>
@@ -137,7 +112,7 @@ const Signup = ({ handleChange }) => {
           />
         </div>
       </div>
-      <div>
+      {/* <div>
         <label className="label_div">Shopify Api Key*</label>
         <div className="input-div">
           <input
@@ -147,8 +122,7 @@ const Signup = ({ handleChange }) => {
             value={shopifyApiKey}
           />
         </div>
-      </div>
-      {/* <div>
+      </div>  <div>
         <label className="label_div">Shopify Api Secret*</label>
         <div className="input-div">
           <input
@@ -158,8 +132,7 @@ const Signup = ({ handleChange }) => {
             value={shopifyApiSecret}
           />
         </div>
-      </div> */}
-      <div>
+      </div>  <div>
         <label className="label_div">Shopify Store Domain*</label>
         <div className="input-div">
           <input
@@ -169,8 +142,7 @@ const Signup = ({ handleChange }) => {
             value={shopifyStoreDomain}
           />
         </div>
-      </div>
-      <div>
+      </div> <div>
         <label className="label_div">Shopify Access Token*</label>
         <div className="input-div">
           <input
@@ -180,7 +152,7 @@ const Signup = ({ handleChange }) => {
             value={shopifyAccessToken}
           />
         </div>
-      </div>
+      </div> */}
       <div className="d-flex">
         <input
           type="checkbox"

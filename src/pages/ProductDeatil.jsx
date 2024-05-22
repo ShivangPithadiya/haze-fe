@@ -1,41 +1,210 @@
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import LoginLayout from '../layouts/LoginLayout'
-import Slider from 'react-slick'
-import { callApi } from '../api/ApiHelper'
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import LoginLayout from '../layouts/LoginLayout';
+import Slider from 'react-slick';
+import { callApi } from '../api/ApiHelper';
+import CustomDots from '../components/themebuilder/MainComponent/CustomDots';
+import AddToCart from './AddToCart';
 
+const ProductDetail = () => {
+  const { productId } = useParams();
+  const [productDetail, setProductDetail] = useState({});
+  const [callingApi, setCallingApi] = useState(true);
+  const [productData, setProductData] = useState({});
+  const [selectedLayer, setSelectedLayer] = useState([]);
+  const [originalImages, setOriginalImages] = useState({});
+ const[SelectedCustomizerData, setSelectedCustomizerData] = useState([]);
+   const [customizerLayerPanel, setCustomizerLayerPanel] = useState({});
+  const [customizerLayerList, setCustomizerLayerList] = useState({});
+   const [customizerPrice, setCustomizerPrice] = useState({});
+  const handleImageClick = (index) => {
+    setSelectedLayer([productData.layerdata[index]]);
+    console.log('Selected Layer:', productData.layerdata[index]);
+  };
 
+  const handleColorClick = async (color) => {
+    try {
+      const layerId = selectedLayer[0].layerId;
+      const colorToApply = color.color.replace('#', '');
+      console.log('Color to apply:', colorToApply);
 
-const ProductDeatil = () => {
-  const {productId} = useParams()
-  const [productDetail,setProductDetail] = useState({})
-  const[callingApi,setCallingApi] = useState(true)
+      const newImages = await Promise.all(
+        originalImages[layerId].map(async (img) => {
+          const newBase64Image = await fetchImageAndApplyColor(img.url, colorToApply);
+          return newBase64Image ? { ...img, url: newBase64Image } : img;
+        })
+      );
 
-  useEffect(()=>{
-    if (callingApi == true) {
-      setCallingApi(false)
-      callApi(`/shopify/products/${productId}`, { method: "GET", data: {} }).then((res)=>{
-        setProductDetail(res?.product)
-          console.log("errr res",res)
-      })
+      setSelectedLayer([{ ...selectedLayer[0], images: newImages }]);
+    } catch (error) {
+      console.error('Error applying color:', error);
     }
-  },[callingApi])
+  };
+
+  const fetchImageAndApplyColor = async (imageUrl, selectedColor) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve, reject) => {
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(blob);
+      const base64Image = await base64Promise;
+
+      const img = new Image();
+      img.src = base64Image;
+
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = img.width;
+      tempCanvas.height = img.height;
+      const tempCtx = tempCanvas.getContext('2d');
+
+      tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+      const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+      const data = imageData.data;
+
+      const targetColor = [255, 255, 255, 255];
+      const tolerance = 10;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const redDiff = Math.abs(data[i] - targetColor[0]);
+        const greenDiff = Math.abs(data[i + 1] - targetColor[1]);
+        const blueDiff = Math.abs(data[i + 2] - targetColor[2]);
+        const alphaDiff = Math.abs(data[i + 3] - targetColor[3]);
+        const totalDiff = redDiff + greenDiff + blueDiff + alphaDiff;
+
+        if (totalDiff <= tolerance) {
+          data[i + 3] = 0;
+        }
+      }
+
+      tempCtx.putImageData(imageData, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'source-atop';
+      ctx.fillStyle = `rgba(${hexToRgb(selectedColor)},1)`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+      const newBase64Image = canvas.toDataURL('image/png');
+
+      return newBase64Image;
+    } catch (error) {
+      console.error('Error fetching and processing image:', error);
+      return null;
+    }
+  };
+
+  const hexToRgb = (hex) => {
+    const bigint = parseInt(hex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `${r},${g},${b}`;
+  };
 
   useEffect(() => {
-    document.body.style.overflow =  "hidden"
+    if (callingApi) {
+      setCallingApi(false);
+      callApi(`/shopify/products/${productId}`, { method: 'GET', data: {} }).then((res) => {
+        setProductDetail(res?.product);
+        console.log('res', res);
+      });
+
+      callApi(`/data/customizerData/${productId}`, { method: 'GET', data: {} }).then((res) => {
+        localStorage.setItem('SelectedCustomizerData', JSON.stringify(res));
+        localStorage.setItem('SelectedId', productId);
+        console.log('reswwwwwwwwww', res);
+      }
+    );
+
+
+      callApi(`/data/ProductData/${productId}`, { method: 'GET', data: {} }).then((res) => {
+        setProductData(res);
+        console.log('res', res);
+
+        const originalImgs = {};
+        res.layerdata.forEach((layer) => {
+          originalImgs[layer.layerId] = layer.images.map((img) => ({ ...img }));
+        });
+        setOriginalImages(originalImgs);
+      });
+    }
+  }, [callingApi]);
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+    useEffect(() => {
+  const SelectedCustomizerData1 = JSON.parse(localStorage.getItem("SelectedCustomizerData"));
+ 
+  setSelectedCustomizerData(SelectedCustomizerData1);
+}, [SelectedCustomizerData]);
+
+ const ProductDetails = SelectedCustomizerData?.ProductDetails;
+  const customizerData = SelectedCustomizerData;
+  const [isMobile, setIsMobile] = useState(false);
+  const [customizerZoom, setCustomizerZoom] = useState({});
+  const [customizerOutOfStock, setCustomizerOutOfStock] = useState({});
+
+  useEffect(() => {
+    setCustomizerLayerPanel({
+      backgroundColor: customizerData?.LayersPanel?.LayersPanelBackgroundColor,
+      border:
+        customizerData?.LayersPanel?.LayersPanelBorderThickness +
+        " solid " +
+        customizerData?.LayersPanel?.LayersPanelBorderColor,
+      PanelPosition: customizerData?.LayersPanel?.LayersPanelPosition,
+    });
+    setCustomizerLayerList({
+      color: customizerData?.LayersList?.LayersListFontColor,
+    });
+    setCustomizerPrice({});
+    setCustomizerZoom({
+      fillColor: customizerData?.Zoom?.ZoomColor,
+    });
+    setCustomizerOutOfStock({
+      fillColor: customizerData?.OutOfStock?.OutOfStockBadgeIconColor,
+      iconBackgroundColor:
+        customizerData?.OutOfStock?.OutOfStockBadgeBackgroundColor,
+    });
+  }, [customizerData, isMobile]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
   function SampleNextArrow(props) {
     const { className, style, onClick } = props;
-  
-    
     return (
       <div
         className={className}
-        style={{ ...style, display: "block" }}
+        style={{ ...style, display: 'block' }}
         onClick={onClick}
       >
         <svg
@@ -59,7 +228,7 @@ const ProductDeatil = () => {
     return (
       <div
         className={className}
-        style={{ ...style, display: "block" }}
+        style={{ ...style, display: 'block' }}
         onClick={onClick}
       >
         <svg
@@ -77,164 +246,103 @@ const ProductDeatil = () => {
       </div>
     );
   }
-
-  // var settings = {
-//   dots: true,
-//   infinite: true,
-//   speed: 500,
-//   slidesToShow: 1,
-//   slidesToScroll: 1,
-//   initialSlide: 0,
-//   nextArrow: <SampleNextArrow />,
-//   prevArrow: <SamplePrevArrow />,
-// };
-
-var settings = {
-  slidesToShow: 1,
-  nextArrow: <SampleNextArrow />,
-  prevArrow: <SamplePrevArrow />,
-  dots: true,
-  fade: true,
-  autoplay: true,
-  autoplaySpeed: 2000,
-  responsive: [
-    {
-      breakpoint: 768,
-      settings: {
-        slidesToShow: 1,
+  var settings = {
+    slidesToShow: 1,
+    customPaging: (i) => <CustomDots active={i === 0} />,
+    nextArrow: <SampleNextArrow />,
+    prevArrow: <SamplePrevArrow />,
+    dots: true,
+    fade: true,
+    autoplay: true,
+    autoplaySpeed: 2000,
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 1,
+        },
       },
-    },
-    {
-      breakpoint: 480,
-      settings: {
-        slidesToShow: 1,
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+        },
       },
-    },
-  ],
-};
-  
+    ],
+  }
+
 
   return (
     <LoginLayout>
       <div className="first__popup">
-              <div className="first__popup__sub__box">
-                <div className="first__popup__left__box">
-                  {/* <svg
-                    // onClick={firstPopup}
-                    width="13"
-                    height="12"
-                    viewBox="0 0 13 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="close__img__popup"
-                  >
-                    <line
-                      x1="1.42426"
-                      y1="0.575736"
-                      x2="12.4243"
-                      y2="11.5757"
-                      stroke="#2D2D2D"
-                      stroke-width="1.2"
-                    />
-                    <line
-                      y1="-0.6"
-                      x2="15.5563"
-                      y2="-0.6"
-                      transform="matrix(-0.707107 0.707107 0.707107 0.707107 12 1)"
-                      stroke="#2D2D2D"
-                      stroke-width="1.2"
-                    />
-                  </svg> */}
-
-                  <h2 className="heading__name">{productDetail?.title}</h2>
-
-                  <div className="mug__color__box">
-                    <h3 className="mug__heading"> Colour</h3>
-                    <div className="border__bottom" />
-                    <div className="mug__colors">
-                      <div className="first mug__box" />
-                      <div className="second mug__box" />
-                      <div className="third mug__box" />
-                      <div className="forth mug__box" />
-                      <div className="five mug__box" />
-                      <div className="six mug__box" />
-                      <div className="seven mug__box" />
-                      <div className="eight mug__box" />
-                      <div className="nine mug__box" />
-                      <div className="ten mug__box" />
-                    </div>
-                  </div>
-
-                  <div className="handle__color__box">
-                    <h3 className="handle__heading">Handle Colour</h3>
-                    <div className="border__bottom" />
-                    <div className="handle__colors">
-                      <div className="first handle__box" />
-                      <div className="second handle__box" />
-                      <div className="third handle__box" />
-                      <div className="forth handle__box" />
-                      <div className="five handle__box" />
-                      <div className="six handle__box" />
-                      <div className="seven handle__box" />
-                      <div className="eight handle__box" />
-                    </div>
-                  </div>
-
-                  <div className="handle__color__box">
-                    <h3 className="handle__heading">Text</h3>
-                    <div className="border__bottom" />
-                    <h4 className="text__printed">Enter Text to be Printed</h4>
-                    <input
-                      placeholder="Your Text"
-                      className="input__txt__field"
-                    />
-                  </div>
-                </div>
-
-                <div className="first__popup__right__box">
-                  <div className="top__right__box">
-                    <div className="price__heading__box">
-                      <h2 className="price__heading">${productDetail?.variants?.[0]?.price}</h2>
-                    </div>
-                    <div className="top__right__img__box">
-                      <img
-                        src="/assets/Image/theme-selector/1.png"
-                        className="right__box__img"
-                        alt="Image"
-                      />
-                      <img
-                        src="/assets/Image/theme-selector/1.svg"
-                        className="right__box__img"
-                        alt="Image"
-                      />
-                    </div>
-                  </div>
+        <div className="first__popup__sub__box">
+          <div className="first__popup__left__box">
+            <h2 className="heading__name">{productDetail?.title}</h2>
+            {productData?.layerdata?.length > 0 &&
+              productData?.layerdata.map((layer, index) => (
+                <div className="mug__color__box" key={index}>
+                  <h3 className="mug__heading">{layer.imageTitle}</h3>
                   <div className="border__bottom" />
-                  {productDetail?.images?.length > 0 &&
-                  <div className="slider__main__box">
-                    <Slider {...settings}>
-                      {productDetail?.images.length > 0 &&productDetail?.images.map((item,key)=>(
-                        <div key={key}>
-                        {console.log("dfdshf",item?.src)}
-                        <img
-                          src={item?.src}
-                          className="slider__right__box__img"
-                          alt={item?.alt ?item?.alt : item?.id }
-                        />
+                  {layer?.dispalyType === 'Image' && (
+                    <>
+                      <div className="products_wrapper_row">
+                        <div className="products_wrapper_col">
+                          <div className="products-active products_wrapper_image" onClick={() => handleImageClick(index)}>
+                            <img src={layer?.Thumbailimage} alt="image" width={40} />
+                          </div>
+                        </div>
                       </div>
-
-                      )) }
-                    </Slider>
-                  </div>
-}
-                  <div className="cart__btn__box">
-                    <button className="cart__btn">Add to cart</button>
-                  </div>
+                    </>
+                  )}
+                  {layer?.dispalyType === 'Colour' && (
+                    <>
+                      <div className="products_wrapper_row">
+                        <div className="products_wrapper_col">
+                          <div className="products_colour_section">
+                            {layer.colours.map((color, index) => (
+                              <span
+                                key={index}
+                                className="products-active"
+                                style={{ backgroundColor: color.color }}
+                                onClick={() => handleColorClick(color)}
+                              ></span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
+              ))}
+          </div>
+          <div className="first__popup__right__box">
+            <div className="top__right__box">
+              <div className="price__heading__box">
+                <h2 className="price__heading">${productDetail?.variants?.[0]?.price}</h2>
+              </div>
+              <div className="top__right__img__box">
+                <img src="/assets/Image/theme-selector/1.png" className="right__box__img" alt="Image" />
+                <img src="/assets/Image/theme-selector/1.svg" className="right__box__img" alt="Image" />
               </div>
             </div>
+            <div className="border__bottom" />
+            <div className="products_slid">
+              {selectedLayer.map((layer, index) => (
+                <Slider {...settings} key={index}>
+                  {layer.images.map((image, index) => (
+                    <div key={index}>
+                      <img src={image.url} alt="image" />
+                    </div>
+                  ))}
+                </Slider>
+              ))}
+            </div>
+          <AddToCart  />
+          </div>
+        </div>
+      </div>
     </LoginLayout>
-  )
-}
+  );
+};
 
-export default ProductDeatil
+export default ProductDetail;

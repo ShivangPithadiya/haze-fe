@@ -3,7 +3,7 @@ import "../products/myproduct.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { customizeProduct,setLayerData, resetState } from "../../features/customizeProductSlice";
+import { customizeProduct, setLayerData, resetState } from "../../features/customizeProductSlice";
 import { LuArrowUpDown } from "react-icons/lu";
 import {
   HiOutlineArrowNarrowDown,
@@ -28,8 +28,8 @@ const MyProduct = (props) => {
   const [showPopup, setShowPopup] = useState(false);
   const [openModallayer, setOpenModallayer] = useState(false);
   const [customizerData, setCustomizerData] = useState([]);
-const authToken =localStorage.getItem('token');
- const ProductCustomizer = useSelector((state) => state?.customizeProduct);
+  const authToken = localStorage.getItem('token');
+  const ProductCustomizer = useSelector((state) => state?.customizeProduct);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -119,40 +119,42 @@ const authToken =localStorage.getItem('token');
 
 
 
-// console.log("customizerData",customizerData.ProductDetails);
-const handelproductclick = (data) => {
-  console.log("data",data);
-  dispatch(resetState());
-//send id from here /data/customizer/:productId and get the data from the database
-const pid = data._id;
-console.log("pid",pid);
-// http://localhost:8080/api/data/customizer/662a3a491227637b0363d8df
-axios.get(`${import.meta.env.VITE_APP_API_URL}/data/customizer/${pid}`, {
-  headers: {
-    Authorization: `Bearer ${authToken}`,
-  },
-})
-.then((response) => {
-  console.log("Sending data ", response.data);
-  setCustomizerData(response.data);
-  localStorage.setItem('SelectedCustomizerData', JSON.stringify(response.data));
-})
-.catch((error) => {
-  console.error("Error fetching data:", error);
-  localStorage.setItem('SelectedCustomizerData', JSON.stringify([]));
-});
+  // console.log("customizerData",customizerData.ProductDetails);
+  const handelproductclick = (data) => {
+    console.log("data", data);
+    dispatch(resetState());
+    //send id from here /data/customizer/:productId and get the data from the database
+    const pid = data._id;
+    console.log("pid", pid);
+    // http://localhost:8080/api/data/customizer/662a3a491227637b0363d8df
+    axios.get(`${import.meta.env.VITE_APP_API_URL}/data/customizer/${pid}`, {
+      headers: {Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => {
+        console.log("Sending data ", response.data);
+        setCustomizerData(response.data);
+        localStorage.setItem('SelectedCustomizerData', JSON.stringify(response.data));
+        localStorage.setItem('SelectedId', pid);
+
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        localStorage.setItem('SelectedCustomizerData', JSON.stringify([]));
+        localStorage.setItem('SelectedId', 'null');
+      });
 
 
 
 
-  data.layerdata.forEach((layer) => {
-    // Dispatch each layer to your Redux store
-    dispatch(setLayerData(layer));
-  });
-  // and send to /product-customizer?productType=Minimal page 
-  const title= 'Minimal';
-  navigate(`/product-customizer?productType=${title}`);
-};
+    data.layerdata.forEach((layer) => {
+      // Dispatch each layer to your Redux store
+      dispatch(setLayerData(layer));
+    });
+    // and send to /product-customizer?productType=Minimal page 
+    const title = 'Minimal';
+    navigate(`/product-customizer?productType=${title}`);
+  };
 
   const duplicateProduct = async (productId) => {
     try {
@@ -163,7 +165,7 @@ axios.get(`${import.meta.env.VITE_APP_API_URL}/data/customizer/${pid}`, {
       console.log("Product duplicated:", response.data);
       // Refresh the product list or perform any other necessary actions
       // For example, refetch products from the server
-  
+
     } catch (error) {
       console.error("Error duplicating product:", error);
     }
@@ -173,28 +175,28 @@ axios.get(`${import.meta.env.VITE_APP_API_URL}/data/customizer/${pid}`, {
   const handleDuplicateProduct = (productId) => {
     duplicateProduct(productId);
   };
-const handleArchive = async (productId) => {
-  try {
-    const response = await axios.patch(
-      `${import.meta.env.VITE_APP_API_URL}/data/ProductData/${productId}`,
-      { status: "inactive" }
-    );
-    // Handle success response, if needed
-    console.log("Product archived:", response.data);
-    // Update local state to reflect the change
-    setProducts(products.map(product => 
-      product._id === productId ? { ...product, status: "inactive" } : product
-    ));
-  } catch (error) {
-    console.error("Error archiving product:", error);
-  }
-};
+  const handleArchive = async (productId) => {
+    try {
+      const response = await axios.patch(
+        `${import.meta.env.VITE_APP_API_URL}/data/ProductData/${productId}`,
+        { status: "inactive" }
+      );
+      // Handle success response, if needed
+      console.log("Product archived:", response.data);
+      // Update local state to reflect the change
+      setProducts(products.map(product =>
+        product._id === productId ? { ...product, status: "inactive" } : product
+      ));
+    } catch (error) {
+      console.error("Error archiving product:", error);
+    }
+  };
 
 
   useEffect(() => {
-    if (products && products.length >0) {
+    if (products && products.length > 0) {
       console.log(",.nmdv",)
-      
+
       setActiveProducts(
         products?.filter((product) => product.status === "active")
       );
@@ -212,6 +214,7 @@ const handleArchive = async (productId) => {
     navigate(`/product-customizer?productType=${productType}`);
     // Remove the data from local storage
     localStorage.setItem('SelectedCustomizerData', JSON.stringify([]));
+    localStorage.setItem('SelectedId', 'null');
     // Show empty
 
 
@@ -385,7 +388,7 @@ const handleArchive = async (productId) => {
                   <div className="my-product-container">
                     {sortedActiveProducts.map((data, index) => (
                       <div key={index} className="my-products-card">
-                        <div className="my-products-img" onClick={()=>handelproductclick(data)}>
+                        <div className="my-products-img" onClick={() => handelproductclick(data)}>
                           <img
                             src={data.layerdata[0]?.Thumbailimage}
                             alt={`Product ${index + 1}`}
@@ -408,19 +411,19 @@ const handleArchive = async (productId) => {
                               </svg>
                             </span>
                             <ul className="dropdown-menu">
-                              <li  onClick={()=>handelproductclick(data)}>
+                              <li onClick={() => handelproductclick(data)}>
                                 <p className="dropdown-item" >
-                                 Preview
+                                  Preview
                                 </p>
                               </li>
-                              <li onClick={()=>handleDuplicateProduct(data._id)}>
+                              <li onClick={() => handleDuplicateProduct(data._id)}>
                                 <p className="dropdown-item" >
                                   Duplicate
                                 </p>
                               </li>
-                               <li onClick={()=>handleArchive(data._id)}>
+                              <li onClick={() => handleArchive(data._id)}>
                                 <p className="dropdown-item" >
-                                 Archive
+                                  Archive
                                 </p>
                               </li>
                             </ul>
@@ -526,7 +529,7 @@ const handleArchive = async (productId) => {
                   <div className="my-product-container">
                     {inactiveProducts.map((data, index) => (
                       <div key={index} className="my-products-card">
-                        <div className="my-products-img">
+                        <div className="my-products-img"  onClick={() => handelproductclick(data)}>
                           <img
                             src={data.layerdata[0].Thumbailimage}
                             alt={`Product ${index + 1}`}

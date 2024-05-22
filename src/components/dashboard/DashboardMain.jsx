@@ -1,22 +1,28 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Chart from "./Chart";
 import axios from "axios";
-import { FaPlus } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { resetState } from "../../features/customizeProductSlice";
 
 const DashboardMain = (props) => {
   const user = useSelector((state) => state.user.user);
+  const [showModal, setShowModal] = useState(true);
+  const [selectedPlatform, setSelectedPlatform] = useState("");
+  const [domain, setDomain] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [orders, setOrders] = React.useState([]);
-  console.log("first",user)
+  const shopifyStoredomain = user?.shopifystoredomain;
+  const shopifyaccesstoken = user?.shopifyaccesstoken;
+  const [orders, setOrders] = useState([]);
+  console.log("first", user);
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const shopifyStoredomain = user?.shopifystoredomain;
-      const shopifyaccesstoken = user?.shopifyaccesstoken;
+      if (!shopifyStoredomain) {
+        setShowModal(true);
+        return;
+      }
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_APP_API_URL}/shopify/orders`,
@@ -57,6 +63,9 @@ const DashboardMain = (props) => {
       100;
   }
   const [monthlySalesData, setMonthlySalesData] = useState([]);
+  const handleClose = () => {
+    setShowModal(false);
+  };
 
   useEffect(() => {
     if (Array.isArray(orders) && orders.length > 0) {
@@ -74,7 +83,35 @@ const DashboardMain = (props) => {
 
   const handleNavigate = (productType) => {
     navigate(`/product-customizer?productType=${productType}`);
+    localStorage.setItem("SelectedId", "null");
+    localStorage.setItem("SelectedCustomizerData", JSON.stringify([]));
     dispatch(resetState());
+  };
+
+  const handlePlatformChange = (e) => {
+    setSelectedPlatform(e.target.value);
+  };
+
+  const handleDomainChange = (e) => {
+    setDomain(e.target.value);
+  };
+  const handelAdd = async () => {
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_APP_API_URL}/profile/updateuser`,
+        {
+          id: user._id,
+          shopifystoredomain: domain,
+        }
+      );
+      if (response.data.success) {
+        setShowModal(false);
+      } else {
+        console.error("Failed to update user:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
   };
 
   return (
@@ -153,13 +190,14 @@ const DashboardMain = (props) => {
               <div className="dashboard_info_cont">
                 <span className="dashboard_info_input">Domain:</span>
                 <a
-                  href="https://hazetest.myshopify.com/"
+                  href={"https://" + shopifyStoredomain}
+                  // shopifyStoredomain
                   className="d-flex"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <span className="dashboard_info_out_put">
-                    https://hazetest.myshopify.com/
+                    https://{shopifyStoredomain}
                   </span>
                   <span className="info_web_icon">
                     {" "}
@@ -285,7 +323,6 @@ const DashboardMain = (props) => {
 
         <div className="home_section2">
           <div className="homw_section_row">
-
             <div className="home_section_col recentorderdiv">
               <div className="home_section_title">Recent Orders</div>
               <div className="data_scroll_bar">
@@ -326,6 +363,86 @@ const DashboardMain = (props) => {
           </div>
         </div>
       </div>
+      {showModal && (
+        <div className="modal-over1">
+          <div className="modal-content1">
+            <div className="px-4 px-lg-0">
+              <div className="pb-5 modal-view">
+                <div className="container">
+                  <div className="row">
+                    <div className="col-12 p-4 bg-white rounded shadow-sm">
+                      <div className="mb-2 d-flex justify-content-between">
+                        <h5>Add your Shop Domain</h5>
+                        <button
+                          className="btn-close rounded-pill btn-block"
+                          onClick={handleClose}
+                        ></button>
+                      </div>
+                      <hr className="m-0 mb-3" />
+                      <div className="select_pricing">
+                        <div className="mb-4">
+                          <label>Enter Your Platform</label>
+                          <select
+                            className="file_select_title p-2 w-100 rounded mt-2"
+                            style={{ border: "1px solid #9C9C9C" }}
+                            value={selectedPlatform}
+                            onChange={handlePlatformChange}
+                          >
+                            <option value="">Select a platform</option>
+                            <option value="Shopify">Shopify</option>
+                            <option value="WooCommerce">WooCommerce</option>
+                          </select>
+                        </div>
+                        {selectedPlatform && (
+                          <div className="mb-4">
+                            <label>Enter Your {selectedPlatform} Domain</label>
+                            <div class="input-group mt-3">
+                              <div class="input-group-prepend">
+                                <span
+                                  class="input-group-text"
+                                  style={{
+                                    borderRadius: "5px 0px 0px 5px",
+                                  }}
+                                >
+                                  https://
+                                </span>
+                              </div>
+
+                              <input
+                                type="text"
+                                className="aq1w1P file_select_title p-2  rounded "
+                                style={{
+                                  border: "1px solid #9C9C9C",
+
+                                  width: "270px",
+                                  height: "38px",
+                                }}
+                                value={domain}
+                                onChange={handleDomainChange}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="buttons">
+                        <button
+                          className="btn border-dark button_close"
+                          onClick={handleClose}
+                        >
+                          Cancel
+                        </button>
+                        <button className="btn btn-dark" onClick={handelAdd}>
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

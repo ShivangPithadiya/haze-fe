@@ -13,7 +13,6 @@ import axios from "axios";
 import Zoom from "./MainComponent/Zoom";
 import ShareButton from "./MainComponent/ShareButton";
 import { useSelector } from "react-redux";
-import { last } from "lodash";
 
 var settings = {
   dots: true,
@@ -29,8 +28,7 @@ var settings = {
 
 const MainContent = () => {
   const [isMobile, setIsMobile] = useState(false);
-  const { customizerData,
-   handleProductChange } = useContext(ThemeContext);
+  const { customizerData, handleProductChange } = useContext(ThemeContext);
   const [customizerLayerPanel, setCustomizerLayerPanel] = useState({});
   const [customizerLayerList, setCustomizerLayerList] = useState({});
   const [customizerPrice, setCustomizerPrice] = useState({});
@@ -40,11 +38,16 @@ const MainContent = () => {
   const [accordionOneOpen, setAccordionOneOpen] = useState(false);
   const [accordionTwoOpen, setAccordionTwoOpen] = useState(false);
   const [accordionThreeOpen, setAccordionThreeOpen] = useState(false);
-  const [SeletedLayer, setSeletedLayer] = useState([]);
+  const [selectedLayer, setSelectedLayer] = useState([]);
   const [openAccordions, setOpenAccordions] = useState([]);
 
   const viewport = useSelector(state => state.customizeProduct.viewport);
- const toggleAccordion = (index) => {
+
+  const [layerData, setLayerData] = useState(null);
+  const [prevProductId, setPrevProductId] = useState(null);
+  const [originalImages, setOriginalImages] = useState({});
+
+  const toggleAccordion = (index) => {
     setOpenAccordions((prev) =>
       prev.includes(index) ? prev.filter((item) => item !== index) : [...prev, index]
     );
@@ -66,48 +69,106 @@ const MainContent = () => {
     setAccordionOneOpen(false);
     setAccordionTwoOpen(false);
   };
+
   const handelimageclick = (index) => {
-    
-  
-    setSeletedLayer([layerData.layerdata[index]]);
-  
+    setSelectedLayer([layerData.layerdata[index]]);
   };
 
-const handleColourclik = async (color) => {
-  try {
-  
-    const layerId = SeletedLayer[0].layerId;
-   
-    const colortoapply = color.color.replace('#', '');
-    console.log('Color to apply:', colortoapply);
+  const handleColourclik = async (color) => {
+    try {
+      const layerId = selectedLayer[0].layerId;
+      const colorToApply = color.color.replace('#', '');
+      console.log('Color to apply:', colorToApply);
 
-    const coloredImages = await Promise.all(
-      SeletedLayer[0].images.map(async (image) => {
-        const lastPart = image.url.split('/').pop();
-     
-        const transformedURL = await axios.get(`https://res.cloudinary.com/dmew5rudk/image/upload/e_gen_recolor:prompt_image;to-color_${colortoapply}/${lastPart}`);
-       console.log('Transformed URL:', transformedURL.config.url);
-        return transformedURL.config.url;
-      })
-    );
+      const newImages = await Promise.all(
+        originalImages[layerId].map(async (img) => {
+          const newBase64Image = await fetchImageAndApplyColor(img.url, colorToApply);
+          return newBase64Image ? { ...img, url: newBase64Image } : img;
+        })
+      );
 
+      setSelectedLayer([{ ...selectedLayer[0], images: newImages }]);
+    } catch (error) {
+      console.error('Error applying color:', error);
+    }
+  };
 
-    setSeletedLayer(prevState => {
-     
-      const updatedImages = prevState[0].images.map((image, index) => ({
-        ...image,
-        url: coloredImages[index], 
-      }));
-      console.log('Updated images:', updatedImages);  
-      return [{
-        ...prevState[0],
-        images: updatedImages,
-      }];
-    });
-  } catch (error) {
-    console.error('Error applying color:', error);
-  }
-};
+  const fetchImageAndApplyColor = async (imageUrl, selectedColor) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve, reject) => {
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(blob);
+      const base64Image = await base64Promise;
+
+      const img = new Image();
+      img.src = base64Image;
+
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = img.width;
+      tempCanvas.height = img.height;
+      const tempCtx = tempCanvas.getContext('2d');
+
+      tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+      const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+      const data = imageData.data;
+
+      const targetColor = [255, 255, 255, 255];
+      const tolerance = 10;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const redDiff = Math.abs(data[i] - targetColor[0]);
+        const greenDiff = Math.abs(data[i + 1] - targetColor[1]);
+        const blueDiff = Math.abs(data[i + 2] - targetColor[2]);
+        const alphaDiff = Math.abs(data[i + 3] - targetColor[3]);
+        const totalDiff = redDiff + greenDiff + blueDiff + alphaDiff;
+
+        if (totalDiff <= tolerance) {
+          data[i + 3] = 0;
+        }
+      }
+
+      tempCtx.putImageData(imageData, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'source-atop';
+      ctx.fillStyle = `rgba(${hexToRgb(selectedColor)},1)`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+      const newBase64Image = canvas.toDataURL('image/png');
+
+      return newBase64Image;
+    } catch (error) {
+      console.error('Error fetching and processing image:', error);
+      return null;
+    }
+  };
+
+  const hexToRgb = (hex) => {
+    const bigint = parseInt(hex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `${r},${g},${b}`;
+  };
 
   useEffect(() => {
     setCustomizerLayerPanel({
@@ -142,35 +203,38 @@ const handleColourclik = async (color) => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  
-const [layerData, setLayerData] = useState(null);
-const [prevProductId, setPrevProductId] = useState(null);
 
-useEffect(() => {
-  const fetchData = async () => {
-    const id = localStorage.getItem('selectedProductId');
-    if (!id || id === prevProductId) return; // Exit if there's no change in product ID
+  useEffect(() => {
+    const fetchData = async () => {
+      const id = localStorage.getItem('selectedProductId');
+      if (!id || id === prevProductId) return; // Exit if there's no change in product ID
 
-    try {
-      const res = await axios.get(`${import.meta.env.VITE_APP_API_URL}/data/ProductData/${id}`);
-      setLayerData(res.data);
-       handleProductChange(res.data);
-      setPrevProductId(id); // Update prevProductId after successful fetch
-    } catch (error) {
-      console.error('Error fetching layer data:', error);
-    }
-  };
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_APP_API_URL}/data/ProductData/${id}`);
+        setLayerData(res.data);
+        handleProductChange(res.data);
 
-  fetchData(); // Initial fetch
+        // Store original images
+        const originalImgs = {};
+        res.data.layerdata.forEach((layer) => {
+          originalImgs[layer.layerId] = layer.images.map((img) => ({ ...img }));
+        });
+        setOriginalImages(originalImgs);
 
-  const intervalId = setInterval(fetchData, 1000); // Check every second for changes in local storage
+        setPrevProductId(id); // Update prevProductId after successful fetch
+      } catch (error) {
+        console.error('Error fetching layer data:', error);
+      }
+    };
 
-  return () => clearInterval(intervalId);
-}, [prevProductId]); // Watch for changes in prevProductId
+    fetchData(); // Initial fetch
 
-console.log('Layer Data:', layerData);
+    const intervalId = setInterval(fetchData, 1000); // Check every second for changes in local storage
 
+    return () => clearInterval(intervalId);
+  }, [prevProductId]); // Watch for changes in prevProductId
 
+  console.log('Layer Data:', layerData);
 
 
 
@@ -246,7 +310,7 @@ console.log('Layer Data:', layerData);
                     </div>
                     <div className="products_slid">
                       {
-                        SeletedLayer.map((layer, index) => (
+                        selectedLayer.map((layer, index) => (
 
                           <Slider {...settings} key={index}>
                             {layer.images.map((image, index) => (
@@ -463,7 +527,7 @@ console.log('Layer Data:', layerData);
                   </div>
                   <div className="products_slid">
                    {
-                        SeletedLayer.map((layer, index) => (
+                        selectedLayer.map((layer, index) => (
 
                           <Slider {...settings} key={index}>
                             {layer.images.map((image, index) => (

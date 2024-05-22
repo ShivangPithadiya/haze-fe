@@ -59,6 +59,8 @@ const MyOrders = () => {
     };
       const handleNavigate = (productType) => {
     navigate(`/product-customizer?productType=${productType}`);
+      localStorage.setItem('SelectedId', 'null');
+     localStorage.setItem('SelectedCustomizerData', JSON.stringify([]));
     dispatch(resetState());
   };
 

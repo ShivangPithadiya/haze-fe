@@ -14,7 +14,6 @@ const MySubscriptions = () => {
     const isChecked = event.target.checked;
     setSelectAll(isChecked);
     if (isChecked) {
-      // If select all checkbox is checked, select all rows
       const allIndices = Array.from({ length: filteredUsers.length }, (_, i) => i);
       setSelectedRows(allIndices);
     } else {
@@ -25,41 +24,64 @@ const MySubscriptions = () => {
   const handleRowSelect = (index) => {
     let updatedSelectedRows;
     if (selectedRows.includes(index)) {
-      // If already selected, remove from selectedRows
       updatedSelectedRows = selectedRows.filter((i) => i !== index);
     } else {
-      // If not selected, add to selectedRows
       updatedSelectedRows = [...selectedRows, index];
     }
     setSelectedRows(updatedSelectedRows);
-    // If all rows are selected, check the "select all" checkbox
     setSelectAll(updatedSelectedRows.length === filteredUsers.length);
   };
+
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchUsers = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_APP_API_URL}/profile/superadmin/getlist-retailer`
+          `${import.meta.env.VITE_APP_API_URL}/profile/super-admin/getlist`
         );
-        setUsers(response.data.users);
+        setUsers(response.data.storeOwners);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching users:", error);
       }
     };
 
-    fetchProducts();
+    fetchUsers();
   }, []);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
 
+  const handleToggleStatus = async () => {
+    try {
+      const updatedUsers = [...users];
+      selectedRows.forEach((index) => {
+        updatedUsers[index].status = updatedUsers[index].status === 'active' ? 'inactive' : 'active';
+      });
+      setUsers(updatedUsers);
+      const promises = selectedRows.map(async (index) => {
+        const response = await axios.put(
+          `${import.meta.env.VITE_APP_API_URL}/profile/store-owner/${updatedUsers[index]._id}`,
+          { user: updatedUsers[index] }
+        );
+        if (response.status === 200) {
+          console.log(`User status updated successfully for user at index ${index}`);
+          alert(`User status updated successfully for user at index ${index}`)
+        } else {
+          console.error(`Error updating user status for user at index ${index}:`, response);
+        }
+      });
+      await Promise.all(promises);
+    } catch (error) {
+      console.error('Error toggling status:', error);
+    }
+  };
+
+  console.log(users);
   const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   return (
-    <div className="left_wrapper">
+    <div className="left_wrapper ">
       <div className="wrapper_header mb-4">
         <div className="wraper_header_title">Subscriptions</div>
         <button className="bg-dark text-white p-2 border rounded">+ Add Store Merchant</button>
@@ -111,7 +133,8 @@ const MySubscriptions = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.length > 0 ? (filteredUsers.map((userData, index) => (
+                {filteredUsers.length > 0 ? (
+                  filteredUsers.map((userData, index) => (
                     <tr className="t_body" key={index}>
                       <td className="border-0">
                         <div className="p-2">
@@ -135,6 +158,7 @@ const MySubscriptions = () => {
                             type="checkbox"
                             id={`flexSwitchCheckDefault-${index}`}
                             checked={userData.status === 'active'}
+                            // onChange={handleToggleStatus}
                             readOnly
                           />
                           <label className="form-check-label" htmlFor={`flexSwitchCheckDefault-${index}`}></label>
@@ -144,14 +168,14 @@ const MySubscriptions = () => {
                   ))
                 ) : (
                   <tr>
-                    <td>
-                      <strong>No data found </strong>
-                    </td>
+                    <td colSpan={8}><strong>No data found</strong></td>
                   </tr>
                 )}
               </tbody>
             </table>
-            <div className="active_deactive"><button className="btn p-0">Activate | Deactivate</button></div>
+            <div className="active_deactive">
+              <button className="btn p-0 p-2" onClick={handleToggleStatus}>Activate | Deactivate</button>
+            </div>
           </div>
         </div>
       </div>

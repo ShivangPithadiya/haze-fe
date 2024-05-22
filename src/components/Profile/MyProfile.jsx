@@ -6,6 +6,7 @@ import { loginUser } from "../../features/userSlice";
 import { useSelector } from "react-redux";
 import _ from "lodash";
 import { Link, useNavigate } from "react-router-dom";
+import edit from '../../assets/img/Group.svg'
 
 const MyProfile = () => {
   const [userData, setUserData] = useState(null);
@@ -95,8 +96,10 @@ const MyProfile = () => {
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
+      alert("Error fetching user data:", error);
     }
-    navigate("/dashboard");
+    alert('Profile details updated successfully');
+    navigate("/your-profile");
   };
 
   useEffect(() => {
@@ -176,7 +179,7 @@ const primagge =_.get(userData, "profileImage", "")
                             />
                             <img
                               class="edit-icon"
-                              src="./public/assets/img/group.svg"
+                              src={edit}
                               onClick={handleIconClick}
                             />
                           </div>
@@ -201,7 +204,7 @@ const primagge =_.get(userData, "profileImage", "")
                           type="text"
                           required
                         />
-                        <img class="edit-icon" src="./public/assets/img/group.svg" />
+                        <img class="edit-icon" src={edit} />
                       </div>
                     </div>
                   </div>
@@ -223,7 +226,7 @@ const primagge =_.get(userData, "profileImage", "")
                           type="text"
                           required
                         />
-                        <img class="edit-icon" src="./public/assets/img/group.svg" />
+                        <img class="edit-icon" src={edit} />
                       </div>
                     </div>
                   </div>
@@ -244,7 +247,7 @@ const primagge =_.get(userData, "profileImage", "")
                           type="text"
                           required
                         />
-                        <img class="edit-icon" src="./public/assets/img/group.svg" />
+                        <img class="edit-icon" src={edit} />
                       </div>
                     </div>
                   </div>
