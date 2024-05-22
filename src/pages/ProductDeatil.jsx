@@ -83,7 +83,7 @@ const ProductDetail = () => {
       const data = imageData.data;
 
       const targetColor = [255, 255, 255, 255];
-      const tolerance = 10;
+      const tolerance = 2;
 
       for (let i = 0; i < data.length; i += 4) {
         const redDiff = Math.abs(data[i] - targetColor[0]);
