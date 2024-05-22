@@ -7,7 +7,7 @@ import { resetState } from "../../features/customizeProductSlice";
 
 const DashboardMain = (props) => {
   const user = useSelector((state) => state.user.user);
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState("");
   const [domain, setDomain] = useState("");
   const dispatch = useDispatch();
