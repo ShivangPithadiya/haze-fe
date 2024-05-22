@@ -4,7 +4,10 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { resetState } from "../../features/customizeProductSlice";
-
+import { signOut } from "firebase/auth";
+import { logoutUser } from "../../features/userSlice";
+import { auth } from "../../firebase";
+import { clearAccessToken } from "../../features/authSlice";
 const DashboardMain = (props) => {
   const user = useSelector((state) => state.user.user);
   const [showModal, setShowModal] = useState(false);
