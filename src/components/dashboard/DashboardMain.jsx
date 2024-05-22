@@ -106,6 +106,17 @@ const DashboardMain = (props) => {
       );
       if (response.data.success) {
         setShowModal(false);
+        localStorage.removeItem("customizerData");
+        dispatch(logoutUser());
+        dispatch(clearAccessToken());
+        signOut(auth);
+        localStorage.clear();
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname
+        );
+
       } else {
         console.error("Failed to update user:", response.data.message);
       }
