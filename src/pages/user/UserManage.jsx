@@ -42,7 +42,7 @@ const UserManage = () => {
 
             if (response.status === 200) {
                 console.log("User deleted successfully:", response.data);
-                setUser(user.filter(user => user.id !== selectedUserId));
+                setUsers(users.filter(user => user.id !== selectedUserId));
                 setDelete(false);
             } else {
                 console.error("Failed to delete user. Server responded with status:", response.status);
@@ -93,6 +93,7 @@ const UserManage = () => {
             const updatedUsers = [...users];
             const currentUser = updatedUsers[index];
             const newStatus = currentUser.status === 'active' ? 'inactive' : 'active';
+            console.log("newStatus",newStatus)
 
             // Update the user's status locally
             updatedUsers[index].status = newStatus;
@@ -101,9 +102,13 @@ const UserManage = () => {
             // Send the updated status to the server
             const response = await axios.put(
                 `${import.meta.env.VITE_APP_API_URL}/profile/store-owner-manager/${id}`,
-                { user: updatedUsers[index] }
-            );
+                { 
+                    
+                    status: newStatus
 
+                 }
+            );
+console.log("response",response)
             if (response.status === 200) {
                 console.log(`User status updated successfully for user at index ${index}`);
                 alert(`User status updated successfully for user at index ${index}`)
@@ -129,7 +134,7 @@ const UserManage = () => {
                         {users?.map((user, index) => (
                             
                             <div key={user._id}>
-                                {console.log("dgfhjhfdsa",user)}
+                               
                                 <div className="user_data d-flex justify-content-between">
                                     <div className="left_side d-flex">
                                         <img src="assets/Image/Avatar.png" alt="" />
