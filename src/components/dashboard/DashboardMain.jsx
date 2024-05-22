@@ -130,7 +130,7 @@ const DashboardMain = (props) => {
 
   return (
     <div className="left_wrapper" style={{ paddingTop: "20px" }}>
-      <div className="wrapper_header p-4">
+      <div className="wrapper_header p-4 pb-0">
         <div className="wraper_header_title">
           Your Dashboard
           <div className="wraper_header_sub_title">
@@ -175,38 +175,38 @@ const DashboardMain = (props) => {
               <img src="assets/Image/deshboard/site.svg" />
             </div>
             <div className="dashboard_info_body">
-              <div className="dashboard_info_cont">
+              <div className="dashboard_info_cont fw-bold">
                 <span className="dashboard_info_input">Site plan:</span>
                 <span className="dashboard_info_out_put">Essential</span>
               </div>
-              <div className="dashoard_info_tag">Manage Plan</div>
+              <div className="dashoard_info_tag fw-bold">Manage Plan</div>
             </div>
           </div>
 
-          <div className="dashoard_col">
+          <div className="dashoard_col align-items-center">
             <div className="dashboard_info_icon">
               <img src="assets/Image/deshboard/Sales.svg" />
             </div>
             <div className="dashboard_info_body">
-              <div className="dashboard_info_cont">
+              <div className="dashboard_info_cont fw-bold">
                 <span className="dashboard_info_input">Sales channel:</span>
                 <span className="dashboard_info_out_put">Shopify</span>
               </div>
-              <div className="dashoard_info_tag">Change Sales Channel</div>
+              <div className="dashoard_info_tag fw-bold">Change Sales Channel</div>
             </div>
           </div>
 
-          <div className="dashoard_col d-sm-flex flex-column">
+          <div className="dashoard_col align-items-center">
             <div className="dashboard_info_icon">
               <img src="assets/Image/deshboard/web.svg" />
             </div>
             <div className="dashboard_info_body">
               <div className="dashboard_info_cont">
-                <span className="dashboard_info_input">Domain:</span>
+                <span className="dashboard_info_input fw-bold">Domain:</span>
                 <a
                   href={"https://" + shopifyStoredomain}
                   // shopifyStoredomain
-                  className="d-flex"
+                  className="d-flex fw-bold"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -242,12 +242,12 @@ const DashboardMain = (props) => {
               </div>
             </div>
             <div className="analytic_view_all">
-              <a href="/orders">View ALL Orders</a>
+              <a href="/orders">View All Orders</a>
             </div>
           </div>
           <div className="homw_section_row">
             <div className="home_section_card">
-              <div className="home_section_card_title">Total Orders</div>
+              <div className="home_section_card_title">Total Earnings</div>
               <div className="home_section_card_body">
                 <div className="home_section_card_cont">
                   <div className="home_ection_card_value">
