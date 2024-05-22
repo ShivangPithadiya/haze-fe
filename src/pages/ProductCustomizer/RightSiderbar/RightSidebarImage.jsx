@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import {
@@ -31,7 +31,7 @@ const RightSidebarImage = () => {
   const [imageName, setImageName] = useState();
   const [selectedOption, setSelectedOption] = useState("");
     const [previewImage, setPreviewImage] = useState("");
-    const modalRef = useRef(null);
+    
 const [thumbnailShow,setThumbnailShow]=useState("")
   useEffect(() => {
     setTitle(ProductCustomizer?.activeLayerData?.imageTitle);
@@ -46,6 +46,7 @@ useEffect(()=>{},[ProductCustomizer])
   }, [ProductCustomizer]);
 
   // console.log("ProductCustomizer", ProductCustomizer.preview);
+
 
   // <------------------------Image title on enter event ------------------------>
   const handleTitle = (e) => {
@@ -120,23 +121,7 @@ const handleImageChange = async (e) => {
     }
   }
 };
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        setModalOpen(false);
-      }
-    };
 
-    if (isModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isModalOpen]);
 // Function to compress the image
 const compressImage = async (image) => {
   const maxFileSizeMB = 1; // Maximum file size in MB after compression
@@ -374,7 +359,7 @@ console.log("existingData",existingData)
 
         {isModalOpen && (
           <div className="side-modal">
-            <div className="modal-dialog" role="document" ref={modalRef}>
+            <div className="modal-dialog" role="document">
               <div className="modal-content px-3">
                 <div className="modal-header">
                   <h5 className="modal-title my-2 mx-2">Upload Thumbail</h5>
@@ -433,55 +418,53 @@ console.log("existingData",existingData)
             </div>
 
             {/* map according to ProductCustomizer.preview */}
-            {Array.isArray(ProductCustomizer?.activeLayerData?.images) &&
-              ProductCustomizer?.activeLayerData?.images.map((item, index) => (
-                <div key={index} className="modal-dialog" role="document">
-                  <div className="modal-content px-3">
-                    <div className="modal-header">
-                      <h5 className="modal-title my-2 mx-2">
-                        Upload Preview{index}
-                      </h5>
-                    </div>
-                    <div className="modal-body">
-                      <form id="imageForm1">
-                        <div class="form_section">
-                          <input
-                            className="image_title px-2"
-                            type="text"
-                            value={item.imageName}
-                            disabled
-                          />
-                        </div>
-                        <div class="form_section">
-                          <label for={`imageInput${index}`}>
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="20"
-                              height="20"
-                              viewBox="0 0 20 20"
-                              fill="none"
-                            >
-                              <path
-                                d="M5.96571 4.89208C5.63086 4.55723 5.63086 4.0144 5.96571 3.67956L9.39429 0.251132C9.72914 -0.0837107 10.272 -0.0837107 10.6069 0.251132L14.0354 3.67956C14.3703 4.0144 14.3703 4.55723 14.0354 4.89208C13.8686 5.05893 13.6491 5.14349 13.4297 5.14349C13.2103 5.14349 12.9909 5.06007 12.824 4.89208L10.8583 2.92645V13.4277C10.8583 13.9008 10.4743 14.2848 10.0011 14.2848C9.528 14.2848 9.144 13.9008 9.144 13.4277V2.92759L7.17829 4.89322C6.84343 5.22806 6.30057 5.22692 5.96571 4.89208ZM19.1429 12.5717C18.6697 12.5717 18.2857 12.9557 18.2857 13.4289V16.8573C18.2857 17.6447 17.6446 18.2858 16.8571 18.2858H3.14286C2.35543 18.2858 1.71429 17.6447 1.71429 16.8573V13.4289C1.71429 12.9557 1.33029 12.5717 0.857143 12.5717C0.384 12.5717 0 12.9557 0 13.4289V16.8573C0 18.5909 1.40914 20 3.14286 20H16.8571C18.5909 20 20 18.5909 20 16.8573V13.4289C20 12.9557 19.616 12.5717 19.1429 12.5717Z"
-                                fill="black"
-                              />
-                            </svg>
-                            <spam>Drop image, or browse</spam>
-                          </label>
-                          <input
-                            type="file"
-                            id={`imageInput${index}`}
-                            accept="image/*"
-                            onChange={(e) =>
-                              handelPreviewImageChange(e, index, item)
-                            }
-                          />
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              ))}
+           {Array.isArray(ProductCustomizer?.activeLayerData?.images) &&
+  ProductCustomizer?.activeLayerData?.images.map((item, index) => (
+    <div key={index} className="modal-dialog" role="document">
+      <div className="modal-content px-3">
+        <div className="modal-header">
+          <h5 className="modal-title my-2 mx-2">
+            Upload Preview{index}
+          </h5>
+        </div>
+        <div className="modal-body">
+          <form id="imageForm1">
+            <div class="form_section">
+              <input
+                className="image_title px-2"
+                type="text"
+                value={item.imageName}
+                disabled
+              />
+            </div>
+            <div class="form_section">
+              <label for={`imageInput${index}`}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                >
+                  <path
+                    d="M5.96571 4.89208C5.63086 4.55723 5.63086 4.0144 5.96571 3.67956L9.39429 0.251132C9.72914 -0.0837107 10.272 -0.0837107 10.6069 0.251132L14.0354 3.67956C14.3703 4.0144 14.3703 4.55723 14.0354 4.89208C13.8686 5.05893 13.6491 5.14349 13.4297 5.14349C13.2103 5.14349 12.9909 5.06007 12.824 4.89208L10.8583 2.92645V13.4277C10.8583 13.9008 10.4743 14.2848 10.0011 14.2848C9.528 14.2848 9.144 13.9008 9.144 13.4277V2.92759L7.17829 4.89322C6.84343 5.22806 6.30057 5.22692 5.96571 4.89208ZM19.1429 12.5717C18.6697 12.5717 18.2857 12.9557 18.2857 13.4289V16.8573C18.2857 17.6447 17.6446 18.2858 16.8571 18.2858H3.14286C2.35543 18.2858 1.71429 17.6447 1.71429 16.8573V13.4289C1.71429 12.9557 1.33029 12.5717 0.857143 12.5717C0.384 12.5717 0 12.9557 0 13.4289V16.8573C0 18.5909 1.40914 20 3.14286 20H16.8571C18.5909 20 20 18.5909 20 16.8573V13.4289C20 12.9557 19.616 12.5717 19.1429 12.5717Z"
+                    fill="black"
+                  />
+                </svg>
+                <spam>Drop image, or browse</spam>
+              </label>
+              <input
+              type="file"
+              id={`imageInput${index}`} 
+              accept="image/*"
+              onChange={(e) => handelPreviewImageChange(e, index, item)}/>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  ))}
+
           </div>
         )}
 
