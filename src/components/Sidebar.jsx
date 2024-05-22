@@ -89,7 +89,7 @@ const Sidebar = ({ isSidebarOpen, closeNav }) => {
                 <span className="sidebar_menu_icon">
                   <img src="assets/Image/home.svg" alt="Home" />
                 </span>
-                <span className={`sidebar_menu_name mt-2 px-2 ${activeLink === "/dashboard" ? "active_list" : ""}`}>
+                <span className={`sidebar_menu_name mt-2 px-2 ${activeLink === "/dashboard" ? "active_list active" : ""}`}>
                   Dashboard
                 </span>
               </Link>
@@ -103,7 +103,7 @@ const Sidebar = ({ isSidebarOpen, closeNav }) => {
                       <span className="sidebar_menu_icon">
                         <img src={item.icon} alt={item.name} />
                       </span>
-                      <span className={`sidebar_menu_name mt-2 px-2 ${activeLink === `/${item.url}` ? "active_list active" : ""
+                      <span className={`sidebar_menu_name mt-2 px-2 ${activeLink === item.url ? "active_list active" : ""
                         }`}>{item.name}</span>
                     </Link>
                   </li>
@@ -118,7 +118,7 @@ const Sidebar = ({ isSidebarOpen, closeNav }) => {
             {userType === 'super-admin' ? <><div style={{ marginBottom: '200px' }}></div>
             </> :
               <li className="sidebar_list mb-4">
-                <Link to='/settings' className={activeLink === '/settings' ? "active" : ""}>
+                <Link to='/settings' className={activeLink === '/settings' ? "active_list active" : ""}>
                   <span className="sidebar_menu_icon">
                     <img src='assets/Image/Settings.svg' alt='Settings' />
                   </span>
@@ -127,7 +127,7 @@ const Sidebar = ({ isSidebarOpen, closeNav }) => {
                 </Link>
               </li>}
 
-            <div className="user_profile">
+            <div className="user_profile ">
               <div className="custom-user-dropdown">
                 <img className="user-avatar" src="assets/Image/Avatar.png" alt="User Avatar" />
                 <div className="user_profile">
@@ -231,7 +231,7 @@ const Sidebar = ({ isSidebarOpen, closeNav }) => {
                       Help Center
                     </a>}
 
-                  <a href="#" onClick={handelLogout}>
+                  <Link to='#' onClick={handelLogout}>
                     <span>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -256,7 +256,7 @@ const Sidebar = ({ isSidebarOpen, closeNav }) => {
                       </svg>
                     </span>
                     Logout
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

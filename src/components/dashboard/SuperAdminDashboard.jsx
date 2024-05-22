@@ -57,7 +57,7 @@ const SuperAdminDashboard = (props) => {
     }, [orders]);
     return (
         <div className="left_wrapper" style={{ paddingTop: "20px" }}>
-            <div className="wrapper_header p-4">
+            <div className="wrapper_header p-4 pb-0">
                 <div className="wraper_header_title">
                     Your Dashboard
                 </div>
